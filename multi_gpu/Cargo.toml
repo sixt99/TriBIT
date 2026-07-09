@@ -1,0 +1,11 @@
+[package]
+name = "rs"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+webgraph = "0.6"
+anyhow = "1"
+lender = "0.6"
+indicatif = "0.17"
+mpi = { version = "0.8", features = ["derive"] }
