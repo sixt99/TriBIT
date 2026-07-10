@@ -2,13 +2,11 @@
 # Makefile for tribit.cu
 # =============================================
 
-
-
 CUDA_VERSION      ?= 12.8
 
 # ------------------ Single GPU ------------------
 SINGLE_TARGET     := tribit
-SINGLE_SOURCE     := single_gpu/src/tribit.cu
+SINGLE_SOURCE     := src/single_gpu/tribit.cu
 
 SINGLE_NVCC_FLAGS := -std=c++20 \
                      --extended-lambda \
@@ -17,10 +15,9 @@ SINGLE_NVCC_FLAGS := -std=c++20 \
                      -code=sm_90
 # ------------------ Single GPU ------------------
 
-
 # ------------------ Multi GPU ------------------
-RUST_DIR          := multi_gpu 
-MULTI_DIR         := multi_gpu/cuda
+RUST_DIR          := src/multi_gpu 
+MULTI_DIR         := src/multi_gpu/cuda
 MULTI_KERNELS     := main5_multi main6_multi
 MULTI_OBJECTS     := $(addprefix $(MULTI_DIR)/lib,$(addsuffix .o,$(MULTI_KERNELS)))
 MULTI_LIBS        := $(addprefix $(MULTI_DIR)/lib,$(addsuffix .a,$(MULTI_KERNELS)))

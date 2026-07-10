@@ -14,3 +14,4 @@ download/download.log
 *.fatbin
 tribit
 **/target/
+*.sif

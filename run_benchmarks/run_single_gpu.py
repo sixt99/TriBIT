@@ -77,8 +77,7 @@ def get_max_memory_consumption_pool(full_path, report_id):
         ''', conn).iloc[0, 0] or 0 # if this is none, put a 0 instead
     conn.close()
     os.remove(report_name + ".sqlite")
-    #peak = int(df.dropna().to_numpy().flatten()[2:].max())  # skip first two dummy allocations
-    peak = int(df.dropna().to_numpy().flatten().max())
+    peak = int(df.dropna().to_numpy().flatten()[2:].max())  # skip first two dummy allocations
     return peak, static_memory
 
 def output_parser_tribit(output: str) -> str:
@@ -96,7 +95,7 @@ def output_parser_tribit(output: str) -> str:
             raise ValueError(f"Could not find '{key}' in output:\n{output}")
         values[key] = match.group(1)
 
-    return ",".join(values[k] for k in ("graph", "n_blocks", "preprocessing_time", "kernel_time", "triangles"))
+    return ",".join(values[k] for k in ("n_blocks", "preprocessing_time", "kernel_time", "triangles"))
 
 exe = args.exe_path.split("/")[-1]
 if "tribit" in exe:
@@ -136,11 +135,12 @@ with open(args.out_path, 'a+') as file:
                         continue
                 # Print name of valid matrix
                 if (args.dry_run):
-                    print(name, flush = True)
+                    print(counter, name, flush = True)
                     counter += 1
                     continue
                 
                 report_id = random_integer()
+
                 try:
                     # Get memory stats
                     if args.get_memory_consumption:
@@ -157,7 +157,7 @@ with open(args.out_path, 'a+') as file:
                             check=True # Raise an exception if the program fails
                         )
                         result = output_parser(result.stdout)
-                        print(name, flush = True)
+                        print(counter, name, flush = True)
                         counter += 1
                         # Write results (only when there is no exception)
                         file.write(f"{args.exe_path},{full_path.split('/')[-1]},{nrows},{ncols},{nnz},{result},{max_memory},{static}\n")
