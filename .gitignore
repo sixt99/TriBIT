@@ -1,2 +1,16 @@
 data
 download/download.log
+*.nsys-rep
+*.sqlite
+*.qdrep
+*.so
+*.exe
+*.out
+*.o
+*.obj
+*.a
+*.ptx
+*.cubin
+*.fatbin
+tribit
+**/target/
