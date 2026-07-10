@@ -1,3 +1,5 @@
+enron
+144
 pli
 cant
 wiki-Vote
@@ -9,7 +11,6 @@ G_n_pin_pout
 usroads
 cage6
 G65
-enron
 hugetric-00020
 preferentialAttachment
 G61
@@ -139,16 +140,12 @@ rgg_n_2_19_s0
 de2010
 it-2004
 uk-2002
-sk-2005
 rgg_n_2_24_s0
 kmer_V1r
 com-Orkut
 kmer_V2a
 soc-LiveJournal1
-mycielskian19
 Queen_4147
-com-Friendster
-mycielskian20
 kron_g500-logn21
 webbase-2001
 mycielskian18
@@ -160,14 +157,11 @@ ljournal-2008
 kmer_A2a
 arabic-2005
 kmer_U1a
-mawi_201512020130
 indochina-2004
 nlpkkt160
 soc-Pokec
 wb-edu
-mawi_201512020030
 rgg_n_2_23_s0
-mawi_201512020330
 sx-stackoverflow
 Spielman_k400
 kmer_P1a
@@ -253,7 +247,6 @@ as-22july06
 333SP
 belgium_osm
 xenon1
-mawi_201512012345
 co2010
 venkat01
 CollegeMsg
@@ -277,7 +270,6 @@ GD01_a
 struct3
 nd24k
 cs4
-mawi_201512020000
 raefsky5
 G18
 msdoor
@@ -504,7 +496,6 @@ debr
 fullb
 soc-Slashdot0811
 email-EuAll
-144
 raefsky6
 Muu
 venkat50

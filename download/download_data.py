@@ -1,6 +1,10 @@
 import ssgetpy
 import subprocess
 import os
+from datetime import datetime
+
+start_time = datetime.now()
+print(f"Begin: {start_time.strftime('%Y-%m-%d %H:%M:%S')}")
 
 with open('graphs.txt', 'r') as file:
     names = [line.strip().replace('.mtx', '') for line in file.readlines() if line.strip()]
@@ -14,7 +18,11 @@ for name in names:
     if not results:
         print(f"NOT FOUND: {name}")
         continue
-    match = results[0]
+    exact = [r for r in results if r.name == name]
+    if not exact:
+        print(f"NOT FOUND (no exact match): {name}")
+        continue
+    match = exact[0]
 
     # Skip if already existing
     extracted_path = f"data/{match.name}"
@@ -36,3 +44,8 @@ for name in names:
         # extract right away
         subprocess.run(["tar", "-xzf", out_path, "-C", "data"])
         os.remove(out_path)
+
+end_time = datetime.now()
+print(f"End: {end_time.strftime('%Y-%m-%d %H:%M:%S')}")
+print(f"Elapsed: {end_time - start_time}")
+

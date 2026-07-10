@@ -1,0 +1,153 @@
+import pandas as pd
+import subprocess
+import argparse
+import tempfile
+import sqlite3
+import os
+import re
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--exe_path', type=str)
+parser.add_argument('--mtx_path', type=str)
+parser.add_argument('--csv_path', type=str)
+parser.add_argument('--dry_run', type=str)
+parser.add_argument('--n_repetitions', type=int)
+parser.add_argument('--get_memory_consumption', type=str)
+args = parser.parse_args()
+
+print("Exe: ", args.exe_path)
+
+# Get 8 random bytes from the OS entropy pool and convert to an integer
+def random_integer():
+    return int.from_bytes(os.urandom(8), "big")
+
+def mtx_file_is_valid(path):
+    is_valid = False
+    with open(path, "r") as f:
+        for line in f:
+            line = line.strip()
+            # skip comments
+            if not line or line.startswith("%"):
+                continue
+            # first non-comment line is: rows cols nnz
+            line = list(map(int, line.split()))
+            # if the number is not good, just return
+            if len(line) != 3:
+                return False, -1, -1, -1
+            nrows, ncols, nnz = line
+            # the matrix should be square!
+            if nrows == ncols:
+                is_valid = True
+            return is_valid, nrows, ncols, nnz
+    return is_valid, -1, -1, -1
+exe = args.exe_path.split("/")[-1]
+
+def get_sqlite3_connection(full_path, report_name):
+    nsys_launch_args = [
+        "nsys", "profile",
+        "--trace", "cuda",
+        "--cuda-memory-usage", "true",
+        "--export", "sqlite",
+        "-f", "true",
+        "-o", report_name 
+    ] + make_execution_args(full_path)
+    result = subprocess.run(
+        nsys_launch_args,
+        #stdout=subprocess.DEVNULL,
+        #stderr=subprocess.DEVNULL,
+        capture_output=False,
+        text=False,
+        check=True # raises an exception if the program fails
+    )
+    os.remove(report_name + ".nsys-rep")
+    conn = sqlite3.connect(report_name + ".sqlite")
+    return conn
+
+def get_max_memory_consumption_pool(full_path, report_id):
+    report_name = f"report_{report_id}"
+    conn = get_sqlite3_connection(full_path, report_name)
+    df = pd.read_sql(
+        '''
+            SELECT localMemoryPoolUtilizedSize
+            FROM CUDA_GPU_MEMORY_USAGE_EVENTS;
+        ''', conn)
+    static_memory = pd.read_sql(
+        '''
+            SELECT SUM(bytes)
+            FROM CUDA_GPU_MEMORY_USAGE_EVENTS
+            WHERE memKind = 5;
+        ''', conn).iloc[0, 0] or 0 # if this is none, put a 0 instead
+    conn.close()
+    os.remove(report_name + ".sqlite")
+    peak = int(df.dropna().to_numpy().flatten()[2:].max())  # skip first two dummy allocations
+    return peak, static_memory
+
+if "tribit" in exe:
+    header = "exe,graph,nrows,ncols,original_nnz,N,nnz,compressed_size_l,compressed_size_u,n_blocks,preprocessing_time,kernel_time,triangles,max_memory_consumption,static_memory"
+    make_execution_args = lambda full_path: [args.exe_path, "-i", full_path]
+    memory_function = get_max_memory_consumption_pool
+    parser = lambda string: ",".join(string.split("\n")[-3].split(",")[1:])
+
+else:
+    print("Executable is not recognised")
+    exit()
+
+counter = 0
+with open(args.csv_path, 'a+') as file:
+    file.seek(0)
+    first_line = file.readline().replace("\n", "")
+    if first_line != header:
+        file.write(header + "\n")
+        file.flush()
+    for root, dirs, files in os.walk(args.mtx_path):
+        for name in dirs + files:
+            full_path = os.path.join(root, name)
+            if full_path.endswith(".mtx"):
+                print(full_path, flush = True)
+                is_valid, nrows, ncols, original_nnz = mtx_file_is_valid(full_path)
+                # Skip (and remove) non-squared matrices
+                if not is_valid:
+                    print(f"Removing {full_path} because it does not have a valid format... nrows,ncols,original_nnz={nrows,ncols,original_nnz}")
+                    #os.remove(full_path)
+                    continue
+
+                if (args.dry_run == "true"):
+                    counter += 1
+                    continue
+                
+                report_id = random_integer()
+                try:
+                    # Get memory stats
+                    if args.get_memory_consumption == "true":
+                        max_memory, static = memory_function(full_path, report_id)
+                    else:
+                        max_memory = 0
+                        static = 0
+                    # Get general stats
+                    for rep in range(args.n_repetitions):
+                        result = subprocess.run(
+                            make_execution_args(full_path),
+                            capture_output=True,
+                            text=True,
+                            check=True # raises an exception if the program fails
+                        )
+                        result = parser(result.stdout)
+                        # Write results (only when there is no exception)
+                        file.write(f"{args.exe_path},{full_path.split('/')[-1]},{nrows},{ncols},{original_nnz},{result},{max_memory},{static}\n")
+                        file.flush()
+
+                except Exception as e:
+                    try:
+                        os.remove(f"report_{report_id}.nsys-rep")
+                        os.remove(f"report_{report_id}.sqlite")
+                    except FileNotFoundError:
+                        pass
+                    print(f"Execution failed for {full_path}")
+                    print(f"* exception type: {type(e).__name__}")
+                    print(f"* exception message: {e}")
+                    if isinstance(e, subprocess.CalledProcessError):
+                        print("* stdout:", e.stdout)
+                        print("* stderr:", e.stderr)
+                        print("* returncode:", e.returncode)
+
+print("Total amount of matrices:", counter)
