@@ -92,6 +92,9 @@ else:
     print("Executable is not recognised")
     exit()
 
+with open('denylist.txt', 'r') as file:
+    denylist = [x.strip() for x in file.readlines()]
+
 counter = 0
 with open(args.csv_path, 'a+') as file:
     file.seek(0)
@@ -103,7 +106,6 @@ with open(args.csv_path, 'a+') as file:
         for name in dirs + files:
             full_path = os.path.join(root, name)
             if full_path.endswith(".mtx"):
-                print(full_path, flush = True)
                 is_valid, nrows, ncols, original_nnz = mtx_file_is_valid(full_path)
                 # Skip (and remove) non-squared matrices
                 if not is_valid:
@@ -111,8 +113,13 @@ with open(args.csv_path, 'a+') as file:
                     #os.remove(full_path)
                     continue
 
+                if any(re.search(pattern, name) for pattern in denylist):
+                    #print(f"Skipping {full_path} due to denylist match")
+                    continue
+
                 if (args.dry_run == "true"):
                     counter += 1
+                    print(name, flush = True)
                     continue
                 
                 report_id = random_integer()
