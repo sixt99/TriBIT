@@ -11,38 +11,49 @@ with open('graphs.txt', 'r') as file:
 
 print(f'{len(names)} graphs detected')
 
-os.makedirs('data', exist_ok=True)
+os.makedirs('../data', exist_ok=True)
 
 for name in names:
-    results = ssgetpy.search(name=name)
+    # Get search results
+    if '/' in name:
+        group, name = name.split('/')[-2:]
+        results = ssgetpy.search(name=name, group=group)
+    else:
+        results = ssgetpy.search(name=name)
+
+    # Nothing was found
     if not results:
         print(f"NOT FOUND: {name}")
         continue
+
     exact = [r for r in results if r.name == name]
+    # Results were found, but none is an exact match
     if not exact:
         print(f"NOT FOUND (no exact match): {name}")
         continue
+
     match = exact[0]
 
     # Skip if already existing
-    extracted_path = f"data/{match.name}"
+    extracted_path = f"../data/{match.name}"
     if os.path.exists(extracted_path):
         print(f"SKIPPING (already exists): {match.name}")
         continue
 
+    # Build URL and download
     url = f"https://sparse.tamu.edu/MM/{match.group}/{match.name}.tar.gz"
-    out_path = f"data/{match.name}.tar.gz"
-
+    out_path = f"../data/{match.name}.tar.gz"
     print(f"Downloading {match.name} from {url}")
     result = subprocess.run(
         ["curl", "-fL", "-o", out_path, url],
         capture_output=True, text=True
     )
+
     if result.returncode != 0:
         print(f"FAILED: {name} — {result.stderr.strip()}")
     else:
-        # extract right away
-        subprocess.run(["tar", "-xzf", out_path, "-C", "data"])
+        # Extract and remove tar file 
+        subprocess.run(["tar", "-xzf", out_path, "-C", "../data"])
         os.remove(out_path)
 
 end_time = datetime.now()
