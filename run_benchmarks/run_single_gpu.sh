@@ -16,11 +16,12 @@ echo "Begin: $timestamp"
 
 python3 run_single_gpu.py \
 	--exe_path ./tribit \
-	--mtx_path ../data \
-	--csv_path result_$SLURM_JOB_ID.csv \
-	--dry_run true \
-	--n_repetitions 5 \
-	--get_memory_consumption true
+	--data_path ../data \
+	--denyfile_path denylist.txt \
+	--out_path result_$SLURM_JOB_ID.csv \
+	--n_repetitions 1 \
+	--dry_run \
+	--get_memory_consumption
 
 timestamp=$(date +"%Y-%m-%d %H:%M:%S")
 echo "End: $timestamp"

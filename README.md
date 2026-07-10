@@ -11,3 +11,4 @@ TODO:
 9. Add a script to analyse results and figures based on the obtained .csv (try to add means and so on)
 10. Maybe could you make the dockerfile smaller? (lowest priority)
 11. Is singularity installed in Chameleon?
+12. Download webgraphs?
