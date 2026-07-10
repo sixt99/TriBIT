@@ -306,12 +306,14 @@ __host__ void read_mtx(const std::string& input_file, std::vector<uint64_t>& col
         cudaMemcpyToSymbol(d_N, &N, sizeof(uint32_t));
 
     // read entries
-        cols_rows_zipped.reserve(nnz);
+    cols_rows_zipped.reserve(nnz);
     uint32_t r, c;
-        double v;
-        // write down only l values
+    // write down only l values
     while (file >> r >> c) {
-                if (file.peek() != '\n' && file >> v) {};
+				while (file.peek() != '\n' && file.peek() != EOF) {
+					double v;
+					if (!(file >> v)) break;
+				}
                 r = r-1;
                 c = c-1;
                 uint64_t zipped;
