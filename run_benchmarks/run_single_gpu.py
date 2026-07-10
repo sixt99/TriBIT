@@ -81,12 +81,29 @@ def get_max_memory_consumption_pool(full_path, report_id):
     peak = int(df.dropna().to_numpy().flatten().max())
     return peak, static_memory
 
+def output_parser_tribit(output: str) -> str:
+    fields = {
+        "n_blocks": r"Blocks of threads\s*:\s*(\d+)",
+        "preprocessing_time": r"Preprocessing \(ms\)\s*:\s*([\d.]+)",
+        "kernel_time": r"Kernel \(ms\)\s*:\s*([\d.]+)",
+        "triangles": r"Triangles\s*:\s*(\d+)",
+    }
+
+    values = {}
+    for key, pattern in fields.items():
+        match = re.search(pattern, output)
+        if not match:
+            raise ValueError(f"Could not find '{key}' in output:\n{output}")
+        values[key] = match.group(1)
+
+    return ",".join(values[k] for k in ("graph", "n_blocks", "preprocessing_time", "kernel_time", "triangles"))
+
 exe = args.exe_path.split("/")[-1]
 if "tribit" in exe:
-    header = "exe,graph,nrows,ncols,original_nnz,N,nnz,compressed_size_l,compressed_size_u,n_blocks,preprocessing_time,kernel_time,triangles,max_memory_consumption,static_memory"
+    header = "exe,graph,nrows,ncols,nnz,n_blocks,preprocessing_time,kernel_time,triangles,max_memory_consumption,static_memory"
     make_execution_args = lambda full_path: [args.exe_path, "-i", full_path]
     memory_function = get_max_memory_consumption_pool
-    output_parser = lambda string: ",".join(string.split("\n")[-3].split(",")[1:])
+    output_parser = output_parser_tribit
 
 else:
     print("Executable is not recognised")
@@ -110,7 +127,7 @@ with open(args.out_path, 'a+') as file:
             full_path = os.path.join(root, name)
             if full_path.endswith(".mtx"):
                 # Skip invalid matrices
-                is_valid, nrows, ncols, original_nnz = mtx_file_is_valid(full_path)
+                is_valid, nrows, ncols, nnz = mtx_file_is_valid(full_path)
                 if not is_valid:
                     continue
                 # Skip blacklisted matrices
@@ -143,7 +160,7 @@ with open(args.out_path, 'a+') as file:
                         print(name, flush = True)
                         counter += 1
                         # Write results (only when there is no exception)
-                        file.write(f"{args.exe_path},{full_path.split('/')[-1]},{nrows},{ncols},{original_nnz},{result},{max_memory},{static}\n")
+                        file.write(f"{args.exe_path},{full_path.split('/')[-1]},{nrows},{ncols},{nnz},{result},{max_memory},{static}\n")
                         file.flush()
 
                 except Exception as e:
