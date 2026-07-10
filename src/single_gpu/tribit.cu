@@ -5,6 +5,7 @@
 #include <x86intrin.h>          // for __rdtsc()
 #include <fstream>              // to read/write files
 #include <sstream>              // to use stringstream
+#include <cuda_profiler_api.h>  // to start/stop profiling
 #include <stdexcept>
 
 #include <thrust/device_ptr.h>
@@ -1043,7 +1044,9 @@ int main(int argc, char* argv[]) {
         uint64_t traingle_count = count_triangles(cols_rows_zipped, nnz, config, false);
 
         // Real
+        cudaProfilerStart();
         traingle_count = count_triangles(cols_rows_zipped, nnz, config, true);
+        cudaProfilerStop();
 
         return 0;
 }
