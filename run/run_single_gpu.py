@@ -109,7 +109,7 @@ with open(args.csv_path, 'a+') as file:
                 is_valid, nrows, ncols, original_nnz = mtx_file_is_valid(full_path)
                 # Skip (and remove) non-squared matrices
                 if not is_valid:
-                    print(f"Removing {full_path} because it does not have a valid format... nrows,ncols,original_nnz={nrows,ncols,original_nnz}")
+                    #print(f"Removing {full_path} because it does not have a valid format... nrows,ncols,original_nnz={nrows,ncols,original_nnz}")
                     #os.remove(full_path)
                     continue
 

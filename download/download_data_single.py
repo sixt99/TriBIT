@@ -1,7 +1,7 @@
-import ssgetpy
-import subprocess
-import os
 from datetime import datetime
+import subprocess
+import ssgetpy
+import os
 
 start_time = datetime.now()
 print(f"Begin: {start_time.strftime('%Y-%m-%d %H:%M:%S')}")

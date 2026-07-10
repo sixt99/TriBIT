@@ -14,9 +14,9 @@ export CUDA_VISIBLE_DEVICES=0
 timestamp=$(date +"%Y-%m-%d %H:%M:%S")
 echo "Begin: $timestamp"
 
-python3 get_benchmark_data.py \
+python3 run_single_gpu.py \
 	--exe_path ./tribit \
-	--mtx_path data \
+	--mtx_path ../data \
 	--csv_path result_$SLURM_JOB_ID.csv \
 	--dry_run true \
 	--n_repetitions 5 \
