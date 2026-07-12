@@ -9,7 +9,7 @@
 
 
 
-srun --gres=gpu:4 src/multi_gpu/target/release/rs data/multi_gpu/gsh-2015-host/gsh-2015-host 64; exit
+srun src/multi_gpu/target/release/rs data/multi_gpu/gsh-2015-host/gsh-2015-host 128 
 
 
 

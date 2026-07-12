@@ -12,3 +12,4 @@ TODO:
 10. Maybe could you make the dockerfile smaller? (lowest priority)
 11. Is singularity installed in Chameleon?
 12. Download webgraphs?
+13. Change GB by GiB in the paper
