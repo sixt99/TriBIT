@@ -69,16 +69,10 @@ def get_max_memory_consumption_pool(full_path, report_id):
             SELECT localMemoryPoolUtilizedSize
             FROM CUDA_GPU_MEMORY_USAGE_EVENTS;
         ''', conn)
-    static_memory = pd.read_sql(
-        '''
-            SELECT SUM(bytes)
-            FROM CUDA_GPU_MEMORY_USAGE_EVENTS
-            WHERE memKind = 5;
-        ''', conn).iloc[0, 0] or 0 # if this is none, put a 0 instead
     conn.close()
     os.remove(report_name + ".sqlite")
     peak = int(df.dropna().to_numpy().flatten()[2:].max())  # skip first two dummy allocations
-    return peak, static_memory
+    return peak 
 
 def output_parser_tribit(output: str) -> str:
     fields = {
@@ -99,7 +93,7 @@ def output_parser_tribit(output: str) -> str:
 
 exe = args.exe_path.split("/")[-1]
 if "tribit" in exe:
-    header = "exe,graph,nrows,ncols,nnz,n_blocks,preprocessing_time,kernel_time,triangles,max_memory_consumption,static_memory"
+    header = "exe,graph,nrows,ncols,nnz,n_blocks,preprocessing_time,kernel_time,triangles,max_memory_consumption"
     make_execution_args = lambda full_path: [args.exe_path, "-i", full_path]
     memory_function = get_max_memory_consumption_pool
     output_parser = output_parser_tribit
@@ -145,10 +139,9 @@ with open(args.out_path, 'a+') as file:
                 try:
                     # Get memory stats
                     if args.get_memory_consumption:
-                        max_memory, static = memory_function(full_path, report_id)
+                        max_memory = memory_function(full_path, report_id)
                     else:
                         max_memory = 0
-                        static = 0
                     # Get general stats
                     for rep in range(args.n_repetitions):
                         result = subprocess.run(
@@ -161,7 +154,7 @@ with open(args.out_path, 'a+') as file:
                         print(counter, name, flush = True)
                         counter += 1
                         # Write results (only when there is no exception)
-                        file.write(f"{args.exe_path},{full_path.split('/')[-1]},{nrows},{ncols},{nnz},{result},{max_memory},{static}\n")
+                        file.write(f"{args.exe_path},{full_path.split('/')[-1]},{nrows},{ncols},{nnz},{result},{max_memory}\n")
                         file.flush()
 
                 except Exception as e:

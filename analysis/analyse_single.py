@@ -1,5 +1,11 @@
 import matplotlib.pyplot as plt
 import pandas as pd
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--file', type=str) 
+parser.add_argument('--output', type=str) 
+args = parser.parse_args()
 
 def merge_duplicates(df):
     time_cols = [c for c in df.columns if "time" in c]
@@ -31,7 +37,7 @@ marker_size = 40
 legend_fontsize = 14
 ticks_fontsize = 15
 markers = [".","x"]
-sorting_magnitude = "original_nnz"
+sorting_magnitude = "nnz"
 
 fig, axs = plt.subplots(2, 2, figsize=(17, 17), sharex=True)
 axs[0, 1].sharey(axs[0, 0])
@@ -44,10 +50,8 @@ for ax in axs.flat:
     ax.tick_params(axis='both', which='major', labelsize=ticks_fontsize)
     ax.tick_params(axis='both', which='minor', labelsize=ticks_fontsize)
 
-file_name = "bsc5.csv"
-
 rescale_factor = 1000
-df = pd.read_csv(file_name)
+df = pd.read_csv(args.file)
 metrics = [metric for metric in df.columns if "time" in metric and "gpu_total_s_time" not in metric]
 df = merge_duplicates(df)
 
@@ -94,7 +98,7 @@ print_number_of_matrices(ax, len(df))
 
 ################# MEMORY CONSUMPTION #################
 ax = axs[1,1]
-ax.set_title("Memory usage (GB)", fontsize = title_size)
+ax.set_title("Memory usage (GiB)", fontsize = title_size)
 ax.set_xlabel("Number NNZs", fontsize = label_size)
 
 xmin = round(df[sorting_magnitude].min())
@@ -103,14 +107,13 @@ ax.hlines(64, xmin, xmax, color = "red", linestyle="-.")
 ax.text(
     xmin,
     40,
-    "64 GB limit",
+    "64 GiB limit",
     fontsize = 15,
     color="red",
     verticalalignment="top"
 )
-ax.scatter(df[sorting_magnitude], df["max_memory_consumption"] / 1024**3, s = marker_size, marker=markers[0], color = "green")
+ax.scatter(df[sorting_magnitude], df["max_memory_consumption"]/ 1024**3, s = marker_size, marker=markers[0], color = "green")
 print_number_of_matrices(ax, len(df))
 
 plt.tight_layout()
-plt.show()
-
+plt.savefig(args.output)

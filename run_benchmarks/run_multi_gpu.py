@@ -12,6 +12,7 @@ parser.add_argument('--partition_file', type=str, required = True)
 parser.add_argument('--out_path', type=str, default = 'results.csv')
 parser.add_argument('--n_repetitions', type=int, default = 1)
 parser.add_argument('--dry_run', action='store_true')
+parser.add_argument('--gpus_per_node', type=str) # If not passed, default is maximum available devices
 args = parser.parse_args()
 
 def read_partition_json(path):
@@ -59,8 +60,14 @@ def output_parser_tribit(output: str) -> str:
         )
     )
 
+def make_execution_args(full_path, partition):
+    args_list = ["srun"]
+    if args.gpus_per_node:
+        args_list.append(f"--gres=gpu:{args.gpus_per_node}")
+    args_list += [args.exe_path, full_path, str(partition)]
+    return args_list
+
 header = "graph,nodes,arcs,graph_memory_gib,load_time,partition,tasks_processed,triangles,counting_time,gpus,triangles_per_sec"
-make_execution_args = lambda full_path, partition: ["srun", args.exe_path, full_path, str(partition)]
 output_parser = output_parser_tribit
 
 partition_dict = read_partition_json(args.partition_file)
