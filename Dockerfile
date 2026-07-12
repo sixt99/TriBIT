@@ -34,11 +34,10 @@ RUN curl -L https://github.com/NVIDIA/cccl/archive/refs/tags/v3.3.0.tar.gz -o cc
     rm -rf cccl.tar.gz cccl-3.3.0 /tmp/cccl-build
 
 # Install pandas
-RUN pip3 install --no-cache-dir pandas
+RUN pip3 install --no-cache-dir tabulate pandas matplotlib
 
 ENV PMIX_MCA_psec=native
 
 WORKDIR /app
 COPY . .
 RUN make
-
