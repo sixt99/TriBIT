@@ -883,7 +883,7 @@ extern "C" uint64_t count_partial_triangles_diagonal(
         uint64_t offset = 0ULL;
         int max_num_blocks_allowed = INT_MAX;
         uint32_t number_of_launches = (uint32_t)((total_num_blocks + (uint64_t)max_num_blocks_allowed - 1) / (uint64_t) max_num_blocks_allowed);
-        if (number_of_launches != 1u) printf("Launching %u kernels...\n", number_of_launches);
+        //if (number_of_launches != 1u) printf("Launching %u kernels...\n", number_of_launches);
 
     for (uint32_t launch = 0; launch < number_of_launches; ++launch) {
                 int blocksPerGrid = (launch != number_of_launches - 1) ? max_num_blocks_allowed : total_num_blocks % max_num_blocks_allowed;

@@ -51,7 +51,6 @@ $(MULTI_DIR)/lib%.a: $(MULTI_DIR)/lib%.o
 
 cargo: 
 	cd $(RUST_DIR) && \
-	cargo clean --release && \
 	cargo build --release
 
 clean:

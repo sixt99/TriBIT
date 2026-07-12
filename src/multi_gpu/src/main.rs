@@ -10,8 +10,8 @@ use std::sync::atomic::{AtomicU32, AtomicU64, Ordering};
 use std::sync::Arc;
 use std::thread;
 use std::fs;
+use std::collections::HashMap;
 
-//mod ffi_cuda {
 extern "C" {
     fn count_partial_triangles_diagonal(
         cols_rows_zipped: *const *const u64,
@@ -34,36 +34,21 @@ extern "C" {
     fn init_gpu_kernel5(gpu_id: i32);
     fn init_gpu_kernel6(gpu_id: i32);
 }
-//}
 
-fn print_memory_breakdown() {
-    let meminfo = std::fs::read_to_string("/proc/meminfo").unwrap();
-    let mut map = std::collections::HashMap::new();
-    for line in meminfo.lines() {
-        let parts: Vec<&str> = line.split_whitespace().collect();
-        if parts.len() >= 2 {
-            let key = parts[0].trim_end_matches(':');
-            let val: u64 = parts[1].parse().unwrap_or(0);
-            map.insert(key.to_string(), val);
-        }
-    }
-    let gib = |kb: u64| kb as f64 / (1024.0 * 1024.0);
-    let get = |k: &str| map.get(k).copied().unwrap_or(0);
+fn read_properties(basename: &str) -> HashMap<String, String> {
+    let path = format!("{}.properties", basename);
+    let contents = fs::read_to_string(&path)
+        .unwrap_or_else(|e| panic!("Failed to read properties file {}: {}", path, e));
 
-    println!("=== Memory Breakdown ===");
-    println!("MemTotal      : {:.2} GiB", gib(get("MemTotal")));
-    println!("MemFree       : {:.2} GiB", gib(get("MemFree")));
-    println!("MemAvailable  : {:.2} GiB", gib(get("MemAvailable")));
-    println!("Buffers       : {:.2} GiB", gib(get("Buffers")));
-    println!("Cached        : {:.2} GiB", gib(get("Cached")));
-    println!("Slab          : {:.2} GiB", gib(get("Slab")));
-    println!("HugePages_Total: {}  x {:.2} GiB = {:.2} GiB",
-        get("HugePages_Total"),
-        gib(get("Hugepagesize")),
-        gib(get("HugePages_Total") * get("Hugepagesize")));
-    println!("Committed_AS  : {:.2} GiB", gib(get("Committed_AS")));
-    println!("=== Gap from 512 GiB: {:.2} GiB ===",
-        512.0 - gib(get("MemAvailable")));
+    contents
+        .lines()
+        .filter_map(|line| {
+            let mut parts = line.splitn(2, '=');
+            let key = parts.next()?.trim().to_string();
+            let value = parts.next()?.trim().to_string();
+            Some((key, value))
+        })
+        .collect()
 }
 
 fn get_available_memory_gib() -> f64 {
@@ -82,45 +67,7 @@ fn get_available_memory_gib() -> f64 {
     panic!("MemAvailable not found in /proc/meminfo");
 }
 
-/*
-fn init_gpu_kernel6(gpu_id: i32) {
-    unsafe {
-        ffi_cuda::init_gpu_kernel(gpu_id);
-    }
-}
-
-fn cuda_get_device_count() -> Result<i32, i32> {
-    let mut value = 0;
-    let res = unsafe { ffi_cuda::cudaGetDeviceCount(&mut value) };
-    if res == 0 {
-        Ok(value)
-    } else {
-        Err(res)
-    }
-}
-
-fn count_partial_triangles_diagonal(
-    cols_rows_zipped: *const *const u64,
-    nnz: &[u64],
-    num_ptrs_cols: u32,
-    num_nodes: u64,
-) -> u64 {
-    let nnz_ptr_raw = nnz.as_ptr();
-    unsafe {
-        ffi_cuda::count_partial_triangles_diagonal(
-            cols_rows_zipped,
-            nnz_ptr_raw,
-            num_ptrs_cols,
-            num_nodes,
-        )
-    }
-}
-*/
-
 fn main() -> anyhow::Result<()> {
-    // Measure total time
-    let start_total = Instant::now();
-
     // MPI managing
     let universe = mpi::initialize().unwrap();
     let world = universe.world();
@@ -138,8 +85,7 @@ fn main() -> anyhow::Result<()> {
     let basename = env::args()
         .nth(1)
         .expect("Please provide graph basename as argument");
-    println!("Basename: {}", basename);
-    let graph = BvGraphSeq::with_basename(basename).load()?;
+    let graph = BvGraphSeq::with_basename(basename.clone()).load()?;
     let mut iter = graph.iter();
     // Number of partitions needed to cover the whole graph
     let num_partitions: usize = env::args()
@@ -152,14 +98,6 @@ fn main() -> anyhow::Result<()> {
     let block_size = (num_nodes / num_partitions).div_ceil(32) * 32; // Closest multiple of 32 rounding up
     let num_partitions = (num_nodes + block_size - 1) / block_size; // All partitions needed to cover this
     let meta_size = num_partitions / size as usize;
-
-    /*
-        // Get total memory in host
-        let mut sys = System::new_all();
-        sys.refresh_memory();
-        let total_host_memory = sys.total_memory();
-        println!("Total memory: {} KB", total_memory);
-    */
 
     let mut cols_rows_zipped_vec: Vec<Vec<Vec<u64>>> =
         vec![vec![Vec::new(); num_partitions]; num_partitions];
@@ -179,7 +117,34 @@ fn main() -> anyhow::Result<()> {
     } else {
         num_partitions as usize
     };
+
+    let print_progress = |progress: u64, edges_loaded: usize, load_start: &Instant| {
+        let mem_gib = (edges_loaded * 8) as f64 / (1u64 << 30) as f64;
+        let host_free_gib = get_available_memory_gib();
+        let elapsed = load_start.elapsed().as_secs_f64();
+        let rate = if elapsed > 0.0 { edges_loaded as f64 / elapsed } else { 0.0 };
+        println!(
+            "Loading {:3}% | graph mem: {:6.2} GiB | host free: {:7.2} GiB | rate: {:>9.0} edges/s",
+            progress, mem_gib, host_free_gib, rate
+        );
+        io::stdout().flush().unwrap();
+    };
+
+    // Load data
+    let load_start = Instant::now();
     while let Some((src, successors)) = iter.next() {
+        // Custom progress bar
+        if rank == 0 && (counter % (total / step_ratio) == 0 || counter == total - 1) {
+            let progress = (counter * 100 + total / 2) / total;
+            let edges_loaded: usize = cols_rows_zipped_vec
+                .iter()
+                .flat_map(|row| row.iter())
+                .map(|block| block.len())
+                .sum();
+            print_progress(progress, edges_loaded, &load_start);
+            io::stdout().flush().unwrap();
+        }
+
         for dst in successors {
             // Flip variables if src < dst. Skip cases where src == dst
             let (row, col) = if dst < src {
@@ -196,28 +161,15 @@ fn main() -> anyhow::Result<()> {
                 nnz_matrix[row / block_size][col / block_size] += 1;
             }
         }
-        // Custom progress bar
-        if rank == 0 && counter % (total / step_ratio) == 0 {
-            let progress = (counter * 100 + total / 2) / total;
-            println!("Loading {}% / 100%", progress);
-            let edges_loaded: usize = cols_rows_zipped_vec.iter()
-                .flat_map(|row| row.iter())
-                .map(|block| block.len())
-                .sum();
-            println!("Number of edges loaded: {}, counter: {}", edges_loaded, counter);
-            let total_bytes: usize = cols_rows_zipped_vec.iter()
-                .flat_map(|row| row.iter())
-                .map(|block| block.len() * 8)
-                .sum();
-            println!("Memory available on host: {}", get_available_memory_gib());
-            print_memory_breakdown();
-            println!("Memory consumed by the graph: {} bytes ({:.2} GiB)", total_bytes, total_bytes as f64 / (1u64 << 30) as f64);
-            io::stdout().flush().unwrap();
-        }
         counter += 1;
     }
+    // Synchronize all ranks
+    world.barrier();
+    let load_duration = load_start.elapsed().as_secs_f64();
+
+
     if rank == 0 {
-        println!("Done")
+        println!("Counting triangles...")
     };
     // Cumsum of nnz_matrix
     //println!("{nnz_matrix:?}");
@@ -227,10 +179,6 @@ fn main() -> anyhow::Result<()> {
             nnz_matrix[i][j] += nnz_matrix[i][j - 1];
         }
     }
-
-
-
-    //println!("{nnz_matrix:?}");
     // -------------------------------------------
 
     // ---------- Create list of tasks -----------
@@ -273,20 +221,6 @@ fn main() -> anyhow::Result<()> {
     let task_counter = Arc::new(AtomicU32::new(0));
     // -------------------------------------------
 
-
-/*
-    list_of_tasks.sort_by_key(|(col, idx_list)| {
-        let total_nnz: usize = idx_list.iter()
-            .map(|&idx| nnz_matrix[idx][*col])
-            .sum();
-        std::cmp::Reverse(total_nnz) // Largest first
-    });
-*/
-
-
-    println!("Tasks:");
-    println!("{:?}", list_of_tasks);
-
     // Synchronize all ranks
     world.barrier();
 
@@ -301,8 +235,6 @@ fn main() -> anyhow::Result<()> {
     // Run first experiments for equal cols and idxs (usually the hardest experiments)
     // Each node will create num_device threads, each managing ONE device
     for gpu_id in 0..num_devices {
-        // To know which partitions we skip, we need the GLOBAL gpu count (considering all nodes)
-        let global_gpu_id = rank * num_devices + gpu_id;
         // Create references
         let cols_rows_zipped_vec = Arc::clone(&cols_rows_zipped_vec);
         let tc = Arc::clone(&tc);
@@ -333,7 +265,6 @@ fn main() -> anyhow::Result<()> {
                         .map(|v| (v.as_ptr(), v.len() as u64))
                         .unzip();
                 // Idxs
-                // TODO in reality, do not do all this if we are in a DIAGONAL CASE
                 let mut idxs_ptr_list: Vec<*const u64> = Vec::new();
                 let mut idxs_len_list: Vec<u64> = Vec::new();
                 for &idx_partition in idx_list {
@@ -364,8 +295,6 @@ fn main() -> anyhow::Result<()> {
                     .collect();
                 let nnz_idxs = *idxs_len_list.last().unwrap();
 
-                println!("Sending {} {}", nnz_cols, nnz_idxs);
-
                 // Launch C++ kernels
                 partial_tc = 0;
                 if nnz_cols != 0 && nnz_idxs != 0 {
@@ -391,7 +320,6 @@ fn main() -> anyhow::Result<()> {
                                 idxs_ptr_list.as_ptr(),
                                 idxs_len_list.as_ptr(),
                                 num_ptrs_idxs as u32,
-                                // TODO if we didn't do UNIQUE inside the kernel, we could trim further L
                                 num_nodes as u64,
                             );
                         }
@@ -400,11 +328,6 @@ fn main() -> anyhow::Result<()> {
                     }
                 }
                 tc.fetch_add(partial_tc, Ordering::Relaxed);
-                println!(
-                    "* Partial count (CP,IP): ({},{:?}) on GPU {}. Triangles: {}. Time: {:.2?}",
-                    col_partition, idx_list, global_gpu_id, partial_tc,
-                    start_processing.elapsed()
-                );
             }
         });
         handles.push(handle);
@@ -418,10 +341,59 @@ fn main() -> anyhow::Result<()> {
     let local_tc = tc.load(Ordering::Relaxed);
     let mut global_tc: u64 = 0;
     world.all_reduce_into(&local_tc, &mut global_tc, SystemOperation::sum());
+    let counting_time = start_processing.elapsed().as_secs_f64();
+
+    // Sum up total number of devices
+    let local_devices = num_devices as u64;
+    let mut total_devices: u64 = 0;
+    world.all_reduce_into(&local_devices, &mut total_devices, SystemOperation::sum());
+
+    // Sum up total number of tasks
+    let local_tasks = list_of_tasks.len() as u64;
+    let mut global_tasks: u64 = 0;
+    world.all_reduce_into(&local_tasks, &mut global_tasks, SystemOperation::sum());
+
     if rank == 0 {
-        println!("Triangle count: {}", global_tc);
-        println!("Processing time: {:?}", start_processing.elapsed());
-        println!("Total execution time: {:?}", start_total.elapsed());
+        let triangles_per_sec = if counting_time > 0.0 {
+            global_tc as f64 / counting_time
+        } else {
+            0.0
+        };
+
+        let props = read_properties(&basename);
+        let declared_nodes: u64 = props.get("nodes").and_then(|s| s.parse().ok()).unwrap_or(0);
+        let declared_arcs: u64 = props.get("arcs").and_then(|s| s.parse().ok()).unwrap_or(0);
+        let graph_mem_gib = (declared_arcs * 8) as f64 / (1u64 << 30) as f64;
+
+        println!(
+            "============================================================\n\
+             {:^60}\n\
+             ============================================================\n\
+             Graph               : {}\n\
+             Nodes (declared)    : {}\n\
+             Arcs (declared)     : {}\n\
+             Graph memory (GiB)  : {:.2}\n\
+             Load time (s)       : {:.2}\n\
+             Partition           : {}\n\
+             Tasks processed     : {}\n\
+             Triangles           : {}\n\
+             Counting time (s)   : {:.2}\n\
+             GPUs                : {}\n\
+             Triangles/sec       : {:.2e}\n\
+             ============================================================",
+            "Triangle Counting Summary",
+            basename,
+            declared_nodes,
+            declared_arcs,
+            graph_mem_gib,
+            load_duration,
+            num_partitions,
+            global_tasks,
+            global_tc,
+            counting_time,
+            total_devices,
+            triangles_per_sec
+        );
     }
 
     Ok(())
