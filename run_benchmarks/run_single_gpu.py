@@ -115,7 +115,7 @@ if args.denyfile_path:
 counter = 0
 with open(args.out_path, 'a+') as file:
     file.seek(0)
-    first_line = file.readline().replace("\n", "")
+    first_line = file.readline().strip()
     if first_line != header:
         file.write(header + "\n")
         file.flush()
@@ -129,11 +129,12 @@ with open(args.out_path, 'a+') as file:
                 is_valid, nrows, ncols, nnz = mtx_file_is_valid(full_path)
                 if not is_valid:
                     continue
+
                 # Skip blacklisted matrices
                 if args.denyfile_path:
                     if any(re.search(pattern, name) for pattern in denylist):
                         continue
-                # Print name of valid matrix
+                
                 if (args.dry_run):
                     print(counter, name, flush = True)
                     counter += 1
@@ -171,12 +172,13 @@ with open(args.out_path, 'a+') as file:
                         except FileNotFoundError:
                             pass
 
-                    print(f"Execution failed for {full_path}")
-                    print(f"* exception type: {type(e).__name__}")
-                    print(f"* exception message: {e}")
+                    print(f"Execution failed for {full_path}", flush = True)
+                    print(f"* exception type: {type(e).__name__}", flush = True)
+                    print(f"* exception message: {e}", flush = True)
                     if isinstance(e, subprocess.CalledProcessError):
-                        print("* stdout:", e.stdout)
-                        print("* stderr:", e.stderr)
-                        print("* returncode:", e.returncode)
+                        print("* stdout:", e.stdout, flush = True)
+                        print("* stderr:", e.stderr, flush = True)
+                        print("* returncode:", e.returncode, flush = True)
+
 
 print("Total amount of matrices:", counter)
