@@ -165,11 +165,11 @@ with open(args.out_path, 'a+') as file:
 
                 except Exception as e:
                     # Try to remove profiler traces, if there were any left
-                    try:
-                        os.remove(f"report_{report_id}.nsys-rep")
-                        os.remove(f"report_{report_id}.sqlite")
-                    except FileNotFoundError:
-                        pass
+                    for ext in (".nsys-rep", ".sqlite"):
+                        try:
+                            os.remove(f"report_{report_id}{ext}")
+                        except FileNotFoundError:
+                            pass
 
                     print(f"Execution failed for {full_path}")
                     print(f"* exception type: {type(e).__name__}")
