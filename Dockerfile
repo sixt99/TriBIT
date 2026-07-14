@@ -38,7 +38,7 @@ ENV PMIX_MCA_psec=native
 # Add the profiler to PATH
 ENV PATH="/opt/nvidia/nsight-compute/2025.1.0/host/target-linux-x64:${PATH}"
 # Fix tmpdir
-ENV "TMPDIR=/tmp"
+ENV TMPDIR="/tmp"
 
 WORKDIR /app
 COPY . .

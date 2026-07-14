@@ -9,14 +9,15 @@ timestamp=$(date +"%Y-%m-%d %H:%M:%S")
 echo "Begin: $timestamp"
 
 export CUDA_VISIBLE_DEVICES=0
+mkdir -p "../results/raw"
 
-
-# TODO REMOVE THE ENVIRONMENT PATH AFTER FIXING DOCKERFILE
-# TODO 
-
-
-NATIVE_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-mkdir -p "$NATIVE_SCRIPT_DIR/../results/raw"
+# Make sure tmpdir exists
+if [[ -n "$TMPDIR" ]]; then
+	echo "TMPDIR is $TMPDIR"
+else
+	echo "Please do 'export TMPDIR=<tmpdir_path>'"
+	exit
+fi
 
 # USING SINGULARITY .SIF FILE
 if [[ -n "$SIF_PATH" ]]; then
@@ -27,14 +28,15 @@ if [[ -n "$SIF_PATH" ]]; then
 		--contain \
         --env "PATH=/opt/nvidia/nsight-compute/2025.1.0/host/target-linux-x64:\$PATH" \
 		--env "TMPDIR=/tmp" \
-        --bind "$NATIVE_SCRIPT_DIR/../data:/app/artifact/sc26/data" \
-		--bind "$NATIVE_SCRIPT_DIR/../results:/app/artifact/sc26/results" \
-		--bind "$NATIVE_SCRIPT_DIR/../run_benchmarks:/app/artifact/sc26/run_benchmarks" \
+		--bind "$TMPDIR:/tmp" \
+        --bind "../data:/app/artifact/sc26/data" \
+		--bind "../results:/app/artifact/sc26/results" \
+		--bind "../run_benchmarks/denylist.txt:/app/artifact/sc26/run_benchmarks/denylist.txt" \
         "$SIF_PATH")
 # RUNNING NATIVELY 
 else
 	echo "Running natively (no SIF_PATH set)"
-	WORKFOLDER="$NATIVE_SCRIPT_DIR/../../.."
+	WORKFOLDER="../../.."
     cmd=()
 fi
 
