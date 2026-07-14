@@ -9,7 +9,6 @@ timestamp=$(date +"%Y-%m-%d %H:%M:%S")
 echo "Begin: $timestamp"
 
 export CUDA_VISIBLE_DEVICES=0
-mkdir -p "../results/raw"
 
 # Make sure tmpdir exists
 if [[ -n "$TMPDIR" ]]; then
@@ -18,6 +17,8 @@ else
 	echo "Please do 'export TMPDIR=<tmpdir_path>'"
 	exit
 fi
+
+# TODO remove unnecessary ENV after docker is updated
 
 # USING SINGULARITY .SIF FILE
 if [[ -n "$SIF_PATH" ]]; then
@@ -44,12 +45,13 @@ exe_path="$WORKFOLDER/./tribit"
 data_path="$WORKFOLDER/artifact/sc26/data"
 denyfile_path="$WORKFOLDER/artifact/sc26/run_benchmarks/denylist.txt"
 results_path="$WORKFOLDER/artifact/sc26/results/raw"
+mkdir -p "../results/raw"
 
 "${cmd[@]}" python3 $WORKFOLDER/artifact/sc26/run_benchmarks/run_single_gpu.py \
     --exe_path "$exe_path" \
     --data_path "$data_path" \
     --denyfile_path "$denyfile_path" \
-    --out_path "$results_path/results_single${SLURM_JOB_ID}.csv" \
+    --out_path "$results_path/results_single.csv" \
     --n_repetitions 1 \
     --get_memory_consumption 
     #--dry_run

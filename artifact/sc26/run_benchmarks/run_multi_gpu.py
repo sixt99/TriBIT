@@ -64,6 +64,16 @@ def make_execution_args(full_path, partition):
     args_list = ["srun"]
     if args.gpus_per_node:
         args_list.append(f"--gres=gpu:{args.gpus_per_node}")
+    # Experiments are run within a singularity file
+    sif_file = os.environ.get("SIF_PATH")
+    if sif_file:
+        args_list += [
+            "--mpi=pmix",
+            "singularity",
+            "exec",
+            "--nv",
+            sif_file
+        ]
     args_list += [args.exe_path, full_path, str(partition)]
     return args_list
 

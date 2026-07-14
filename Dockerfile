@@ -33,8 +33,6 @@ RUN curl -L https://github.com/NVIDIA/cccl/archive/refs/tags/v3.3.0.tar.gz -o cc
 
 # Install python packages
 RUN pip3 install --no-cache-dir tabulate pandas matplotlib 
-# Run PMIX by default
-ENV PMIX_MCA_psec=native
 # Add the profiler to PATH
 ENV PATH="/opt/nvidia/nsight-compute/2025.1.0/host/target-linux-x64:${PATH}"
 # Fix tmpdir

@@ -5,22 +5,37 @@
 #SBATCH --cpus-per-task=80
 #SBATCH --ntasks-per-node=1
 #SBATCH --time 02:00:00
-#SBATCH --nodes=8
-
-set -euo pipefail
+#SBATCH --nodes=2
 
 timestamp=$(date +"%Y-%m-%d %H:%M:%S")
 echo "Begin: $timestamp"
 
-mkdir -p ../results
+# USING SINGULARITY .SIF FILE
+if [[ -n "$SIF_PATH" ]]; then
+    WORKFOLDER="/app"
+	echo "Running inside container: $SIF_PATH"
+# RUNNING NATIVELY 
+else
+	WORKFOLDER="../../.."
+    echo "Running natively (no SIF_PATH set)"
+fi
+
+exe_path="$WORKFOLDER/src/multi_gpu/target/release/rs"
+# No need to bind the following paths if "--contain" is not added to singularity run
+data_path="../data/multi_gpu/gsh-2015-host"
+denyfile_path="denylist.txt"
+partition_path="partitions.json"
+results_path="../results/raw"
+mkdir -p $results_path 
+
 python3 run_multi_gpu.py \
-	--exe_path ../../../src/multi_gpu/target/release/rs \
-	--data_path ../data/multi_gpu/uk-2006-09 \
-	--denyfile_path denylist.txt \
-	--partition_file partitions.json \
-	--out_path ../results/results_debug.csv \
-	--n_repetitions 1 
-	#--dry_run \
+    --exe_path "$exe_path" \
+    --data_path "$data_path" \
+    --denyfile_path "$denyfile_path" \
+	--partition_file "$partition_path" \
+    --out_path "$results_path/results_multi.csv" \
+    --n_repetitions 1
+    #--dry_run
 
 timestamp=$(date +"%Y-%m-%d %H:%M:%S")
 echo "End: $timestamp"
