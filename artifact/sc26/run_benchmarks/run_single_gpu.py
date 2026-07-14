@@ -14,7 +14,6 @@ parser.add_argument('--out_path', type=str, default = 'results.csv')
 parser.add_argument('--n_repetitions', type=int, default = 1)
 parser.add_argument('--dry_run', action='store_true')
 parser.add_argument('--get_memory_consumption', action='store_true')
-parser.add_argument('--max_number_matrices', type=int, required = False)
 args = parser.parse_args()
 
 print("Exe: ", args.exe_path)
@@ -134,16 +133,8 @@ with open(args.out_path, 'a+') as file:
                 # Stop when dry_run is on 
                 if (args.dry_run):
                     print(counter, name, flush = True)
-                    if args.max_number_matrices and counter >= args.max_number_matrices:
-                        keep = False
-                        break
                     counter += 1
                     continue
-
-                # Cut when get to the limit of matrices available
-                if args.max_number_matrices and counter >= args.max_number_matrices:
-                    keep = False
-                    break
                 
                 report_id = random_integer()
 
@@ -165,7 +156,7 @@ with open(args.out_path, 'a+') as file:
                         print(counter, name, flush = True)
                         counter += 1
                         # Write results (only when there is no exception)
-                        file.write(f"{args.exe_path},{full_path.split('/')[-1]},{nrows},{ncols},{nnz},{result},{max_memory}\n")
+                        file.write(f"{args.exe_path.split('/')[-1]},{full_path.split('/')[-1]},{nrows},{ncols},{nnz},{result},{max_memory}\n")
                         file.flush()
 
                 except Exception as e:

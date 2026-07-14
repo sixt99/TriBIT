@@ -7,6 +7,8 @@
 #SBATCH --time 02:00:00
 #SBATCH --nodes=8
 
+set -euo pipefail
+
 timestamp=$(date +"%Y-%m-%d %H:%M:%S")
 echo "Begin: $timestamp"
 

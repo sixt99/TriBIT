@@ -1,7 +1,7 @@
+from matplotlib.ticker import ScalarFormatter
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from matplotlib.ticker import ScalarFormatter
 import argparse
 
 parser = argparse.ArgumentParser()
