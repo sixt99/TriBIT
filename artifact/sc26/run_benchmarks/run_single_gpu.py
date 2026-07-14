@@ -14,6 +14,7 @@ parser.add_argument('--out_path', type=str, default = 'results.csv')
 parser.add_argument('--n_repetitions', type=int, default = 1)
 parser.add_argument('--dry_run', action='store_true')
 parser.add_argument('--get_memory_consumption', action='store_true')
+parser.add_argument('--max_number_matrices', type=int, required = False)
 args = parser.parse_args()
 
 print("Exe: ", args.exe_path)
@@ -107,6 +108,7 @@ if args.denyfile_path:
         denylist = [x.strip() for x in file.readlines()]
 
 counter = 0
+keep = True
 with open(args.out_path, 'a+') as file:
     file.seek(0)
     first_line = file.readline().strip()
@@ -118,7 +120,7 @@ with open(args.out_path, 'a+') as file:
     for root, dirs, files in os.walk(args.data_path):
         for name in files:
             full_path = os.path.join(root, name)
-            if full_path.endswith(".mtx"):
+            if full_path.endswith(".mtx") and keep:
                 # Skip invalid matrices
                 is_valid, nrows, ncols, nnz = mtx_file_is_valid(full_path)
                 if not is_valid:
@@ -128,11 +130,20 @@ with open(args.out_path, 'a+') as file:
                 if args.denyfile_path:
                     if any(re.search(pattern, name) for pattern in denylist):
                         continue
-                
+               
+                # Stop when dry_run is on 
                 if (args.dry_run):
                     print(counter, name, flush = True)
+                    if args.max_number_matrices and counter >= args.max_number_matrices:
+                        keep = False
+                        break
                     counter += 1
                     continue
+
+                # Cut when get to the limit of matrices available
+                if args.max_number_matrices and counter >= args.max_number_matrices:
+                    keep = False
+                    break
                 
                 report_id = random_integer()
 
