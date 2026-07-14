@@ -173,5 +173,4 @@ with open(args.out_path, 'a+') as file:
                         print("* stderr:", e.stderr, flush = True)
                         print("* returncode:", e.returncode, flush = True)
 
-
 print("Total amount of matrices:", counter)

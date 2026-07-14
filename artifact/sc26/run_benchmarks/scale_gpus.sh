@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH --account bsc03
-#SBATCH --qos=acc_debug
+#SBATCH --qos=acc_bsccs
 #SBATCH --gres=gpu:4
 #SBATCH --cpus-per-task=80
 #SBATCH --ntasks-per-node=1
@@ -31,8 +31,8 @@ fi
 for FILE in "${files[@]}"; do
         for N_GPUS in "${GPUS_PER_NODE[@]}"; do
                 python3 run_multi_gpu.py \
-                        --exe_path ../src/multi_gpu/target/release/rs \
-                        --data_path "../data/multi_gpu/test/$FILE" \
+                        --exe_path ../../../src/multi_gpu/target/release/rs \
+                        --data_path "../data/multi_gpu/$FILE" \
                         --denyfile_path denylist.txt \
                         --partition_file partitions.json \
                         --out_path ../results/results_multi.csv \
