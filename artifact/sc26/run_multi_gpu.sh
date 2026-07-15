@@ -5,7 +5,7 @@
 #SBATCH --cpus-per-task=80
 #SBATCH --ntasks-per-node=1
 #SBATCH --time 02:00:00
-#SBATCH --nodes=2
+#SBATCH --nodes=8
 
 timestamp=$(date +"%Y-%m-%d %H:%M:%S")
 echo "Begin: $timestamp"
@@ -22,7 +22,7 @@ fi
 
 exe_path="$WORKFOLDER/src/multi_gpu/target/release/rs"
 # No need to bind the following paths if "--contain" is not added to singularity run
-data_path="data/multi_gpu/gsh-2015-host"
+data_path="data/multi_gpu"
 denyfile_path="run_benchmarks/denylist.txt"
 partition_path="run_benchmarks/partitions.json"
 results_path="results/raw"
