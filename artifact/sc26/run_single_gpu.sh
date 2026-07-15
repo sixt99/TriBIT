@@ -52,9 +52,7 @@ results_path="$ARTIFACT_DIR/results/raw"
     --out_path "$results_path/results_single.csv" \
     --n_repetitions 1 \
     --get_memory_consumption \
-	--max_matrices 10
     #--dry_run
-# TODO REMOVE THE MAX MATRICES
 
 # Plot results
 "${cmd[@]}" python3 $ARTIFACT_DIR/analysis/analyse_single.py --input "$results_path/results_single.csv" --output "$results_path/../plot_single_gpu.png" 

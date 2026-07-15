@@ -36,5 +36,8 @@ python3 run_benchmarks/run_multi_gpu.py \
     --n_repetitions 1
     #--dry_run
 
+# Plot results
+singularity exec $SIF_PATH python3 analysis/analyse_multi.py --input "$results_path/results_multi.csv" --output "$results_path/../plot_multi_gpu.txt" 
+
 timestamp=$(date +"%Y-%m-%d %H:%M:%S")
 echo "End: $timestamp"

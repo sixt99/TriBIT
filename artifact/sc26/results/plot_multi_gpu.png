@@ -1,0 +1,4 @@
+graph                                          nodes        arcs    graph_memory_gib    load_time    partition    tasks_processed     triangles    counting_time    gpus    triangles_per_sec
+------------------------------------------  --------  ----------  ------------------  -----------  -----------  -----------------  ------------  ---------------  ------  -------------------
+data/multi_gpu/gsh-2015-host/gsh-2015-host  68660142  1802747600               13.43        24.83          128                255  520901310734            13.31       8             3.91e+10
+data/multi_gpu/gsh-2015-host/gsh-2015-host  68660142  1802747600               13.43        24.69          128                255  520901310734            13.33       8             3.91e+10
