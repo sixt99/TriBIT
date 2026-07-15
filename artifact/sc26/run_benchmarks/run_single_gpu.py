@@ -14,6 +14,7 @@ parser.add_argument('--out_path', type=str, default = 'results.csv')
 parser.add_argument('--n_repetitions', type=int, default = 1)
 parser.add_argument('--dry_run', action='store_true')
 parser.add_argument('--get_memory_consumption', action='store_true')
+parser.add_argument('--max_matrices', type=int, required = False) 
 args = parser.parse_args()
 
 print("Exe: ", args.exe_path)
@@ -106,8 +107,13 @@ if args.denyfile_path:
     with open(args.denyfile_path, 'r') as file:
         denylist = [x.strip() for x in file.readlines()]
 
+# Make sure the folder of the out file exists
+out_dir = os.path.dirname(args.out_path)
+if out_dir:
+    os.makedirs(out_dir, exist_ok=True)
+
+iterate = True
 counter = 0
-keep = True
 with open(args.out_path, 'a+') as file:
     file.seek(0)
     first_line = file.readline().strip()
@@ -117,9 +123,13 @@ with open(args.out_path, 'a+') as file:
 
     # Walk over all possible files ending with .mtx
     for root, dirs, files in os.walk(args.data_path):
+        if not iterate:
+            break
         for name in files:
+            if not iterate:
+                break
             full_path = os.path.join(root, name)
-            if full_path.endswith(".mtx") and keep:
+            if full_path.endswith(".mtx"):
                 # Skip invalid matrices
                 is_valid, nrows, ncols, nnz = mtx_file_is_valid(full_path)
                 if not is_valid:
@@ -130,6 +140,10 @@ with open(args.out_path, 'a+') as file:
                     if any(re.search(pattern, name) for pattern in denylist):
                         continue
                
+                # Stop when max_matrices is reached 
+                if args.max_matrices and counter >= args.max_matrices - 1:
+                    iterate = False
+
                 # Stop when dry_run is on 
                 if (args.dry_run):
                     print(counter, name, flush = True)

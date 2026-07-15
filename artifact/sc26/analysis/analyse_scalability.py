@@ -5,7 +5,7 @@ import pandas as pd
 import argparse
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--file', type=str) 
+parser.add_argument('--input', type=str) 
 parser.add_argument('--output', type=str) 
 args = parser.parse_args()
 
@@ -29,7 +29,7 @@ plt.figure(figsize=(15,7))
 plt.plot(x, x, marker="v", color="black", label="Linear", linestyle="-.")
 
 # TriBIT (larger graphs)
-df = pd.read_csv(args.file)
+df = pd.read_csv(args.input)
 df = merge_duplicates(df)
 
 speedups = {}

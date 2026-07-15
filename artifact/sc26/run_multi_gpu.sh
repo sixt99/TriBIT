@@ -16,17 +16,16 @@ if [[ -n "$SIF_PATH" ]]; then
 	echo "Running inside container: $SIF_PATH"
 # RUNNING NATIVELY 
 else
-	WORKFOLDER="../../.."
+	WORKFOLDER="../.."
     echo "Running natively (no SIF_PATH set)"
 fi
 
 exe_path="$WORKFOLDER/src/multi_gpu/target/release/rs"
 # No need to bind the following paths if "--contain" is not added to singularity run
-data_path="../data/multi_gpu/gsh-2015-host"
-denyfile_path="denylist.txt"
-partition_path="partitions.json"
-results_path="../results/raw"
-mkdir -p $results_path 
+data_path="data/multi_gpu/gsh-2015-host"
+denyfile_path="run_benchmarks/denylist.txt"
+partition_path="run_brenchmarks/partitions.json"
+results_path="results/raw"
 
 python3 run_multi_gpu.py \
     --exe_path "$exe_path" \

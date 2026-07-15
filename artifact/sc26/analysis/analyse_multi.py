@@ -3,11 +3,11 @@ import argparse
 import csv
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--file', type=str, required = True)
+parser.add_argument('--input', type=str, required = True)
 parser.add_argument('--output', type=str)
 args = parser.parse_args()
 
-with open(args.file) as f:
+with open(args.input) as f:
     reader = csv.reader(f)
     header = next(reader)
     rows = list(reader)

@@ -86,6 +86,11 @@ if args.denyfile_path:
     with open(args.denyfile_path, 'r') as file:
         denylist = [x.strip() for x in file.readlines()]
 
+# Make sure the folder of the out file exists
+out_dir = os.path.dirname(args.out_path)
+if out_dir:
+    os.makedirs(out_dir, exist_ok=True)
+
 counter = 0
 with open(args.out_path, 'a+') as file:
     file.seek(0)

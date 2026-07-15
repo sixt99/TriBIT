@@ -15,46 +15,49 @@ if [[ -n "$TMPDIR" ]]; then
 	echo "TMPDIR is $TMPDIR"
 else
 	echo "Please do 'export TMPDIR=<tmpdir_path>'"
-	exit
+	exit 1
 fi
-
-# TODO remove unnecessary ENV after docker is updated
 
 # USING SINGULARITY .SIF FILE
 if [[ -n "$SIF_PATH" ]]; then
 	echo "Running inside container: $SIF_PATH"
 	WORKFOLDER="/app"
+	ARTIFACT_DIR="$WORKFOLDER/artifact/sc26"
     cmd=(singularity exec \
 	    --nv \
 		--contain \
-        --env "PATH=/opt/nvidia/nsight-compute/2025.1.0/host/target-linux-x64:\$PATH" \
-		--env "TMPDIR=/tmp" \
 		--bind "$TMPDIR:/tmp" \
-        --bind "../data:/app/artifact/sc26/data" \
-		--bind "../results:/app/artifact/sc26/results" \
-		--bind "../run_benchmarks/denylist.txt:/app/artifact/sc26/run_benchmarks/denylist.txt" \
+        --bind "data:$ARTIFACT_DIR/data" \
+		--bind "results:$ARTIFACT_DIR/results" \
+		--bind "run_benchmarks/denylist.txt:$ARTIFACT_DIR/run_benchmarks/denylist.txt" \
         "$SIF_PATH")
 # RUNNING NATIVELY 
 else
 	echo "Running natively (no SIF_PATH set)"
-	WORKFOLDER="../../.."
+	WORKFOLDER="../.."
+	ARTIFACT_DIR="."
     cmd=()
 fi
 
 exe_path="$WORKFOLDER/./tribit"
-data_path="$WORKFOLDER/artifact/sc26/data"
-denyfile_path="$WORKFOLDER/artifact/sc26/run_benchmarks/denylist.txt"
-results_path="$WORKFOLDER/artifact/sc26/results/raw"
-mkdir -p "../results/raw"
+data_path="$ARTIFACT_DIR/data"
+denyfile_path="$ARTIFACT_DIR/run_benchmarks/denylist.txt"
+results_path="$ARTIFACT_DIR/results/raw"
 
-"${cmd[@]}" python3 $WORKFOLDER/artifact/sc26/run_benchmarks/run_single_gpu.py \
+# Count triangles
+"${cmd[@]}" python3 $ARTIFACT_DIR/run_benchmarks/run_single_gpu.py \
     --exe_path "$exe_path" \
     --data_path "$data_path" \
     --denyfile_path "$denyfile_path" \
     --out_path "$results_path/results_single.csv" \
     --n_repetitions 1 \
-    --get_memory_consumption 
+    --get_memory_consumption \
+	--max_matrices 10
     #--dry_run
+# TODO REMOVE THE MAX MATRICES
+
+# Plot results
+"${cmd[@]}" python3 $ARTIFACT_DIR/analyse/analyse_single.py --input "$results_path/results_single.csv" --output "$results_path/../plot_single_gpu.png" 
 
 timestamp=$(date +"%Y-%m-%d %H:%M:%S")
 echo "End: $timestamp"

@@ -3,7 +3,7 @@ import pandas as pd
 import argparse
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--file', type=str) 
+parser.add_argument('--intpu', type=str) 
 parser.add_argument('--output', type=str) 
 args = parser.parse_args()
 
@@ -51,7 +51,7 @@ for ax in axs.flat:
     ax.tick_params(axis='both', which='minor', labelsize=ticks_fontsize)
 
 rescale_factor = 1000
-df = pd.read_csv(args.file)
+df = pd.read_csv(args.input)
 metrics = [metric for metric in df.columns if "time" in metric and "gpu_total_s_time" not in metric]
 df = merge_duplicates(df)
 
