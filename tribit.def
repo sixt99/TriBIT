@@ -1,0 +1,54 @@
+Bootstrap: docker
+From: nvidia/cuda:12.8.0-devel-ubuntu22.04
+
+%files
+    . /app
+
+%environment
+    export RUSTUP_HOME=/usr/local/rustup
+    export CARGO_HOME=/usr/local/cargo
+    export PATH=/usr/local/cargo/bin:$PATH
+    export CUDA_ARCH_DIR="$NVARCH-linux"
+    export LIBRARY_PATH="/usr/local/cuda-12.8/targets/${CUDA_ARCH_DIR}/lib:${LIBRARY_PATH}"
+    export LD_LIBRARY_PATH="/usr/local/cuda-12.8/targets/${CUDA_ARCH_DIR}/lib:${LD_LIBRARY_PATH}"
+    export PATH="/opt/nvidia/nsight-compute/2025.1.0/host/target-linux-x64:${PATH}"
+    export TMPDIR="/tmp"
+
+%post
+	set -e
+    export RUSTUP_HOME=/usr/local/rustup
+    export CARGO_HOME=/usr/local/cargo
+    export PATH=/usr/local/cargo/bin:$PATH
+
+    apt-get update && apt-get install -y --no-install-recommends \
+        curl build-essential ca-certificates pkg-config libssl-dev libclang-dev \
+        cmake git vim \
+        software-properties-common \
+        libopenmpi-dev openmpi-bin libpmix-dev libpmix2 \
+        python3 python3-venv python3-pip \
+        && rm -rf /var/lib/apt/lists/*
+
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | \
+        sh -s -- -y --default-toolchain 1.92.0 --profile minimal
+
+    export CUDA_ARCH_DIR="$NVARCH-linux"
+    export LIBRARY_PATH="/usr/local/cuda-12.8/targets/${CUDA_ARCH_DIR}/lib:${LIBRARY_PATH}"
+    export LD_LIBRARY_PATH="/usr/local/cuda-12.8/targets/${CUDA_ARCH_DIR}/lib:${LD_LIBRARY_PATH}"
+
+    curl -L https://github.com/NVIDIA/cccl/archive/refs/tags/v3.3.0.tar.gz -o cccl.tar.gz && \
+        tar -xzf cccl.tar.gz && \
+        cmake -S cccl-3.3.0 -B /tmp/cccl-build \
+            -DCMAKE_INSTALL_PREFIX=/usr/local/cuda-12.8/targets/$CUDA_ARCH_DIR \
+            -DCMAKE_BUILD_TYPE=Release && \
+        cmake --build /tmp/cccl-build --target install -j2 && \
+        rm -rf cccl.tar.gz cccl-3.3.0 /tmp/cccl-build
+
+    pip3 install --no-cache-dir tabulate pandas matplotlib
+
+    export PATH="/opt/nvidia/nsight-compute/2025.1.0/host/target-linux-x64:${PATH}"
+    export TMPDIR="/tmp"
+
+    cd /app && make
+
+%runscript
+    exec /app/tribit "$@"

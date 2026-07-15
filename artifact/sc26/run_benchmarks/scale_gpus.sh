@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH --account bsc03
-#SBATCH --qos=acc_debug
+#SBATCH --qos=acc_bsccs
 #SBATCH --gres=gpu:4
 #SBATCH --cpus-per-task=80
 #SBATCH --ntasks-per-node=1
