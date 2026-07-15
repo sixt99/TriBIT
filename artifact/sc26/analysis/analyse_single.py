@@ -3,7 +3,7 @@ import pandas as pd
 import argparse
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--intpu', type=str) 
+parser.add_argument('--input', type=str) 
 parser.add_argument('--output', type=str) 
 args = parser.parse_args()
 

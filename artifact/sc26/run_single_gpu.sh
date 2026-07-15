@@ -57,7 +57,7 @@ results_path="$ARTIFACT_DIR/results/raw"
 # TODO REMOVE THE MAX MATRICES
 
 # Plot results
-"${cmd[@]}" python3 $ARTIFACT_DIR/analyse/analyse_single.py --input "$results_path/results_single.csv" --output "$results_path/../plot_single_gpu.png" 
+"${cmd[@]}" python3 $ARTIFACT_DIR/analysis/analyse_single.py --input "$results_path/results_single.csv" --output "$results_path/../plot_single_gpu.png" 
 
 timestamp=$(date +"%Y-%m-%d %H:%M:%S")
 echo "End: $timestamp"

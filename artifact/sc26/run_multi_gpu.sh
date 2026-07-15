@@ -24,10 +24,10 @@ exe_path="$WORKFOLDER/src/multi_gpu/target/release/rs"
 # No need to bind the following paths if "--contain" is not added to singularity run
 data_path="data/multi_gpu/gsh-2015-host"
 denyfile_path="run_benchmarks/denylist.txt"
-partition_path="run_brenchmarks/partitions.json"
+partition_path="run_benchmarks/partitions.json"
 results_path="results/raw"
 
-python3 run_multi_gpu.py \
+python3 run_benchmarks/run_multi_gpu.py \
     --exe_path "$exe_path" \
     --data_path "$data_path" \
     --denyfile_path "$denyfile_path" \

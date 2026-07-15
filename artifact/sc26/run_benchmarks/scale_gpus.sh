@@ -45,7 +45,7 @@ results_path="results/raw"
 for FILE in "${files[@]}"; do
 	data_path="data/multi_gpu/$FILE"
     for N_GPUS in "${GPUS_PER_NODE[@]}"; do
-        python3 run_multi_gpu.py \
+        python3 run_benchmarks/run_multi_gpu.py \
 			--exe_path $exe_path \
 			--data_path "$data_path" \
 			--denyfile_path "$denyfile_path" \
