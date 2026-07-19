@@ -11,7 +11,25 @@ DATASETS=(
   "eu-2015/eu-2015"
 )
 BASE_URL="http://data.law.di.unimi.it/webdata"
-OUTPUT_FOLDER="../data/multi_gpu"
+OUTPUT_FOLDER="data/multi_gpu"
+
+# Parse arguments
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --output)
+      OUTPUT_FOLDER="$2"
+      shift 2
+      ;;
+    --output=*)
+      OUTPUT_FOLDER="${1#*=}"
+      shift
+      ;;
+    *)
+      echo "Unknown argument: $1"
+      exit 1
+      ;;
+  esac
+done
 
 mkdir -p "$OUTPUT_FOLDER"
 
