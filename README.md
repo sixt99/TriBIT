@@ -61,13 +61,13 @@ This produces:
 
 ```bash
 cd artifact/sc26
-python3 download/download_data_single.py --input download/graph.txt --output data # Requires ssgetpy
+python3 download/download_data_single.py --input download/graphs.txt --output data # Requires ssgetpy
 ```
 If using `tribit.sif`, 
 ```bash
 cd artifact/sc26
 export SIF_PATH=/path/to/tribit.sif
-singularity exec "$SIF_PATH" python3 download/download_data_single.py --input download/graph.txt --output data
+singularity exec "$SIF_PATH" python3 download/download_data_single.py --input download/graphs.txt --output data
 ```
 - Downloads 174.57 GiB.
 
