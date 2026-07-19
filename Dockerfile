@@ -37,6 +37,8 @@ RUN pip3 install --no-cache-dir tabulate pandas matplotlib
 ENV PATH="/opt/nvidia/nsight-compute/2025.1.0/host/target-linux-x64:${PATH}"
 # Fix tmpdir
 ENV TMPDIR="/tmp"
+# Avoid munge
+ENV PMIX_MCA_psec=native
 
 WORKDIR /app
 COPY . .

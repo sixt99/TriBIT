@@ -13,9 +13,10 @@ From: nvidia/cuda:12.8.0-devel-ubuntu22.04
     export LD_LIBRARY_PATH="/usr/local/cuda-12.8/targets/${CUDA_ARCH_DIR}/lib:${LD_LIBRARY_PATH}"
     export PATH="/opt/nvidia/nsight-compute/2025.1.0/host/target-linux-x64:${PATH}"
     export TMPDIR="/tmp"
+	export PMIX_MCA_psec=native
 
 %post
-	set -e
+    set -e
     export RUSTUP_HOME=/usr/local/rustup
     export CARGO_HOME=/usr/local/cargo
     export PATH=/usr/local/cargo/bin:$PATH

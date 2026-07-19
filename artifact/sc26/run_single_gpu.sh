@@ -31,6 +31,7 @@ if [[ -n "$SIF_PATH" ]]; then
 		--bind "results:$ARTIFACT_DIR/results" \
 		--bind "run_benchmarks/denylist.txt:$ARTIFACT_DIR/run_benchmarks/denylist.txt" \
         "$SIF_PATH")
+
 # RUNNING NATIVELY 
 else
 	echo "Running natively (no SIF_PATH set)"

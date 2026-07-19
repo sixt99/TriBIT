@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH --account bsc03
-#SBATCH --qos=acc_bsccs
+#SBATCH --qos=acc_debug
 #SBATCH --gres=gpu:4
 #SBATCH --cpus-per-task=80
 #SBATCH --ntasks-per-node=1
@@ -13,10 +13,13 @@ echo "Begin: $timestamp"
 # USING SINGULARITY .SIF FILE
 if [[ -n "$SIF_PATH" ]]; then
     WORKFOLDER="/app"
+	plot_cmd=(singularity exec "$SIF_PATH")
 	echo "Running inside container: $SIF_PATH"
+
 # RUNNING NATIVELY 
 else
 	WORKFOLDER="../.."
+	plot_cmd=()
     echo "Running natively (no SIF_PATH set)"
 fi
 
@@ -37,7 +40,7 @@ python3 run_benchmarks/run_multi_gpu.py \
     #--dry_run
 
 # Plot results
-singularity exec $SIF_PATH python3 analysis/analyse_multi.py --input "$results_path/results_multi.csv" --output "$results_path/../plot_multi_gpu.txt" 
+"${plot_cmd[@]}" python3 analysis/analyse_multi.py --input "$results_path/results_multi.csv" --output "$results_path/../plot_multi_gpu.txt" 
 
 timestamp=$(date +"%Y-%m-%d %H:%M:%S")
 echo "End: $timestamp"
