@@ -44,7 +44,7 @@ From: nvidia/cuda:12.8.0-devel-ubuntu22.04
         cmake --build /tmp/cccl-build --target install -j2 && \
         rm -rf cccl.tar.gz cccl-3.3.0 /tmp/cccl-build
 
-    pip3 install --no-cache-dir tabulate pandas matplotlib
+    pip3 install --no-cache-dir tabulate pandas matplotlib ssgetpy
 
     export PATH="/opt/nvidia/nsight-compute/2025.1.0/host/target-linux-x64:${PATH}"
     export TMPDIR="/tmp"
