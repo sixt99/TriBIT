@@ -1,17 +1,23 @@
 from datetime import datetime
 import subprocess
+import argparse
 import ssgetpy
 import os
 
 start_time = datetime.now()
 print(f"Begin: {start_time.strftime('%Y-%m-%d %H:%M:%S')}")
 
-with open('graphs.txt', 'r') as file:
+parser = argparse.ArgumentParser()
+parser.add_argument('--input', type=str, required = True) 
+parser.add_argument('--output', type=str, required = True) 
+args = parser.parse_args()
+
+with open(args.input, 'r') as file:
     names = [line.strip().replace('.mtx', '') for line in file.readlines() if line.strip()]
 
 print(f'{len(names)} graphs detected')
 
-os.makedirs('../data', exist_ok=True)
+os.makedirs(args.output, exist_ok=True)
 
 for name in names:
     # Get search results
@@ -35,14 +41,14 @@ for name in names:
     match = exact[0]
 
     # Skip if already existing
-    extracted_path = f"../data/{match.name}"
+    extracted_path = f"{args.output}/{match.name}"
     if os.path.exists(extracted_path):
         print(f"SKIPPING (already exists): {match.name}")
         continue
 
     # Build URL and download
     url = f"https://sparse.tamu.edu/MM/{match.group}/{match.name}.tar.gz"
-    out_path = f"../data/{match.name}.tar.gz"
+    out_path = f"{args.output}/{match.name}.tar.gz"
     print(f"Downloading {match.name} from {url}")
     result = subprocess.run(
         ["curl", "-fL", "-o", out_path, url],
@@ -53,10 +59,11 @@ for name in names:
         print(f"FAILED: {name} — {result.stderr.strip()}")
     else:
         # Extract and remove tar file 
-        subprocess.run(["tar", "-xzf", out_path, "-C", "../data"])
+        subprocess.run(["tar", "-xzf", out_path, "-C", f"{args.output}"])
         os.remove(out_path)
 
 end_time = datetime.now()
 print(f"End: {end_time.strftime('%Y-%m-%d %H:%M:%S')}")
 print(f"Elapsed: {end_time - start_time}")
+
 
