@@ -39,7 +39,6 @@ If no container is used, TriBIT can be built natively. This requires:
 - **Rust** (via `rustup`, toolchain `1.92.0`) for the multi-GPU components.
 - An **MPI implementation** (e.g. OpenMPI with libopenmpi-dev, openmpi-bin, and PMIx via libpmix-dev, libpmix2; or Intel MPI v2021.16, bundled with Intel oneAPI 2025.2) for multi-node/multi-GPU communication.
 - Standard build tools: `build-essential`, `cmake`, `git`, `pkg-config`, `libssl-dev`, `libclang-dev`.
-- **Python 3** with `tabulate`, `pandas`, `matplotlib`, and `ssgetpy` installed (for benchmarking/analysis scripts).
 
 Once dependencies are installed, build both the single-GPU and multi-GPU executables with:
 
