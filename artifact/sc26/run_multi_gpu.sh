@@ -36,7 +36,7 @@ python3 run_benchmarks/run_multi_gpu.py \
     --denyfile_path "$denyfile_path" \
 	--partition_file "$partition_path" \
     --out_path "$results_path/results_multi.csv" \
-    --n_repetitions 1
+    --n_repetitions 1 
     #--dry_run
 
 # Plot results

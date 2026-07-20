@@ -52,7 +52,7 @@ results_path="$ARTIFACT_DIR/results/raw"
     --denyfile_path "$denyfile_path" \
     --out_path "$results_path/results_single.csv" \
     --n_repetitions 1 \
-    --get_memory_consumption \
+    --get_memory_consumption 
     #--dry_run
 
 # Plot results

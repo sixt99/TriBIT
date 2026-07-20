@@ -18,3 +18,4 @@ result*csv
 *.tar
 *.sif
 *.png
+**/results/
