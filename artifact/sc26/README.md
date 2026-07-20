@@ -1,6 +1,6 @@
 # SC26 Artifact
 
-This repository contains the artifact for the SC26 submission: data-download utilities, benchmarking scripts, and analysis/plotting scripts for single-GPU and multi-GPU triangle-counting experiments, plus a multi-node scalability study.
+This folder contains the artifact for the SC26 submission: data-download utilities, benchmarking scripts, and analysis/plotting scripts for single-GPU and multi-GPU triangle-counting experiments, plus a multi-node scalability study.
 
 ## 1. Prerequisites
 
@@ -11,7 +11,7 @@ This repository contains the artifact for the SC26 submission: data-download uti
 
 ## 2. Building a Singularity Image (recommended)
 
-**Option 1: Pull `.sif` from repo**
+**Option 1: Pull `.sif`**
 ```bash
 singularity pull tribit.sif library://sixte99/tribit/tribit:v1
 ```
@@ -38,7 +38,7 @@ If no container is used, TriBIT can be built natively. This requires:
 - **CUDA 12.8** (`nvcc`) with an H100-compatible architecture (`compute_90`/`sm_90`).
 - **CCCL v3.3.0**, installed under the CUDA targets directory.
 - **Rust** (via `rustup`, toolchain `1.92.0`) for the multi-GPU components.
-- **OpenMPI** (`libopenmpi-dev`, `openmpi-bin`) and **PMIx** (`libpmix-dev`, `libpmix2`) for multi-node/multi-GPU communication.
+- An **MPI implementation** (e.g. OpenMPI with libopenmpi-dev, openmpi-bin, and PMIx via libpmix-dev, libpmix2; or Intel MPI v2021.16, bundled with Intel oneAPI 2025.2) for multi-node/multi-GPU communication.
 - Standard build tools: `build-essential`, `cmake`, `git`, `pkg-config`, `libssl-dev`, `libclang-dev`.
 - **Python 3** with `tabulate`, `pandas`, `matplotlib`, and `ssgetpy` installed (for benchmarking/analysis scripts).
 
