@@ -55,13 +55,13 @@ This produces:
 
 ## 4. Run Single-GPU TriBIT
 ```bash
-./tribit -i nemeth23.mtx
+./tribit -i wiki-Vote.mtx
 ```
 
 If using the `.sif` file:
 
 ```bash
-singularity exec --nv tribit.sif /app/./tribit -i nemeth23.mtx
+singularity exec --nv tribit.sif /app/./tribit -i wiki-Vote.mtx
 ```
 
 ## 5. Run Multi-GPU TriBIT
