@@ -55,13 +55,13 @@ This produces:
 
 ## 4. Run Single-GPU TriBIT
 ```bash
-./tribit -i cant.mtx
+./tribit -i nemeth23.mtx
 ```
 
 If using the `.sif` file:
 
 ```bash
-singularity exec --nv tribit.sif /app/./tribit -i cant.mtx
+singularity exec --nv tribit.sif /app/./tribit -i nemeth23.mtx
 ```
 
 ## 5. Run Multi-GPU TriBIT
