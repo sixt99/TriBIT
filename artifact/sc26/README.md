@@ -27,8 +27,6 @@ singularity pull tribit.sif library://sixte99/tribit/tribit:v1
 sudo singularity build tribit.sif tribit.def
 ```
 
-
-
 **Option 3: Build with Docker, then convert to `.sif`**
 
 ```bash
@@ -66,16 +64,16 @@ This produces:
 ## 4. Downloading Data
 
 ### Single-GPU (SuiteSparse Matrix Collection)
-
+If using `tribit.sif`, 
+```bash
+export SIF_PATH=/path/to/tribit.sif
+cd artifact/sc26
+singularity exec "$SIF_PATH" python3 download/download_data_single.py --input download/graphs.txt --output data
+```
+If NOT using `tribit.sif`,
 ```bash
 cd artifact/sc26
 python3 download/download_data_single.py --input download/graphs.txt --output data # Requires ssgetpy
-```
-If using `tribit.sif`, 
-```bash
-cd artifact/sc26
-export SIF_PATH=/path/to/tribit.sif
-singularity exec "$SIF_PATH" python3 download/download_data_single.py --input download/graphs.txt --output data
 ```
 - Downloads 174.57 GiB.
 
@@ -94,9 +92,9 @@ chmod +x download/download_data_multi.sh
 ### Single-GPU Benchmark
 
 ```bash
-cd artifact/sc26
-export TMPDIR=/path/to/tmpdir
 export SIF_PATH=/path/to/tribit.sif   # optional; omit to run natively
+export TMPDIR=/path/to/tmpdir
+cd artifact/sc26
 ./run_single_gpu.sh           # directly
 #sbatch run_single_gpu.sh     # or via SLURM
 ```
@@ -109,8 +107,8 @@ export SIF_PATH=/path/to/tribit.sif   # optional; omit to run natively
 ### Multi-GPU Benchmark
 
 ```bash
-cd artifact/sc26
 export SIF_PATH=/path/to/tribit.sif   # optional; omit to run natively
+cd artifact/sc26
 sbatch run_multi_gpu.sh # SLURM is needed for 32-GPU experiments
 ```
 
@@ -122,8 +120,8 @@ sbatch run_multi_gpu.sh # SLURM is needed for 32-GPU experiments
 ### Scalability Sweep (1–7 nodes)
 
 ```bash
-cd artifact/sc26
 export SIF_PATH=/path/to/tribit.sif   # optional; omit to run natively
+cd artifact/sc26
 chmod +x run_scalability.sh
 ./run_scalability.sh
 ```
