@@ -33,7 +33,6 @@ docker build -t tribit .
 docker save tribit -o tribit.tar
 singularity build tribit.sif docker-archive://tribit.tar
 ```
-Once built, `tribit.sif` can be pointed to via `export SIF_PATH=/path/to/tribit.sif` for all benchmark scripts.
 
 ## 3. Building TriBIT From Scratch
 
