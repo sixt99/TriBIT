@@ -7,6 +7,11 @@ This folder contains the artifact for the SC26 submission: data-download utiliti
 - For single-GPU experiments, an H100 GPU or similar.
 - For multi-GPU and scalability experiments, access to a SLURM cluster with up to 32 H100 GPUs (4 per node, up to 8 nodes).
 - The experiments below can be run natively (no container required) or by using a Singularity/Apptainer image (`tribit.sif`), which already contains the built executables and Python dependencies (recommended).
+- You can install Singularity/Apptainer by running
+```bash
+sudo apt update
+sudo apt install singularity-container
+```
 - Run `export SIF_PATH=/path/to/tribit.sif` to run benchmark + plotting inside the Singularity container for full reproducibility; leave it unset to run natively against local builds.
 
 ## 2. Building a Singularity Image (recommended)
