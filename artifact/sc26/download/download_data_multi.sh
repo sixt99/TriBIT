@@ -13,8 +13,8 @@ DATASETS=(
 BASE_URL="http://data.law.di.unimi.it/webdata"
 
 DATASETS_HYPERLINK=(
-  "https://data.dws.informatik.uni-mannheim.de/hyperlinkgraph/2014-03/webgraph/webgraph"
-  "https://data.dws.informatik.uni-mannheim.de/hyperlinkgraph/2012-08/webgraph/network"
+  #"https://data.dws.informatik.uni-mannheim.de/hyperlinkgraph/2014-03/webgraph/webgraph"
+  #"https://data.dws.informatik.uni-mannheim.de/hyperlinkgraph/2012-08/webgraph/network"
 )
 
 OUTPUT_FOLDER="data/multi_gpu"
