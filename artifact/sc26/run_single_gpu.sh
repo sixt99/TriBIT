@@ -12,32 +12,32 @@ export CUDA_VISIBLE_DEVICES=0
 
 # Make sure tmpdir exists
 if [[ -n "$TMPDIR" ]]; then
-	echo "TMPDIR is $TMPDIR"
+    echo "TMPDIR is $TMPDIR"
 else
-	echo "Please do 'export TMPDIR=<tmpdir_path>'"
-	exit 1
+    echo "Please do 'export TMPDIR=<tmpdir_path>'"
+    exit 1
 fi
 
 # USING SINGULARITY .SIF FILE
 if [[ -n "$SIF_PATH" ]]; then
-	echo "Running inside container: $SIF_PATH"
-	WORKFOLDER="/app"
-	ARTIFACT_DIR="$WORKFOLDER/artifact/sc26"
-	mkdir -p results/raw
+    echo "Running inside container: $SIF_PATH"
+    WORKFOLDER="/app"
+    ARTIFACT_DIR="$WORKFOLDER/artifact/sc26"
+    mkdir -p results/raw
     cmd=(singularity exec \
-	    --nv \
-		--contain \
-		--bind "$TMPDIR:/tmp" \
+        --nv \
+        --contain \
+        --bind "$TMPDIR:/tmp" \
         --bind "data:$ARTIFACT_DIR/data" \
-		--bind "results:$ARTIFACT_DIR/results" \
-		--bind "run_benchmarks/denylist.txt:$ARTIFACT_DIR/run_benchmarks/denylist.txt" \
+        --bind "results:$ARTIFACT_DIR/results" \
+        --bind "run_benchmarks/denylist.txt:$ARTIFACT_DIR/run_benchmarks/denylist.txt" \
         "$SIF_PATH")
 
 # RUNNING NATIVELY 
 else
-	echo "Running natively (no SIF_PATH set)"
-	WORKFOLDER="../.."
-	ARTIFACT_DIR="."
+    echo "Running natively (no SIF_PATH set)"
+    WORKFOLDER="../.."
+    ARTIFACT_DIR="."
     cmd=()
 fi
 

@@ -13,13 +13,13 @@ echo "Begin: $timestamp"
 # USING SINGULARITY .SIF FILE
 if [[ -n "$SIF_PATH" ]]; then
     WORKFOLDER="/app"
-	plot_cmd=(singularity exec "$SIF_PATH")
-	echo "Running inside container: $SIF_PATH"
+    plot_cmd=(singularity exec "$SIF_PATH")
+    echo "Running inside container: $SIF_PATH"
 
 # RUNNING NATIVELY 
 else
-	WORKFOLDER="../.."
-	plot_cmd=()
+    WORKFOLDER="../.."
+    plot_cmd=()
     echo "Running natively (no SIF_PATH set)"
 fi
 
@@ -34,7 +34,7 @@ python3 run_benchmarks/run_multi_gpu.py \
     --exe_path "$exe_path" \
     --data_path "$data_path" \
     --denyfile_path "$denyfile_path" \
-	--partition_file "$partition_path" \
+    --partition_file "$partition_path" \
     --out_path "$results_path/results_multi.csv" \
     --n_repetitions 1 
     #--dry_run
