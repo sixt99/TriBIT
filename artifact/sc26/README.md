@@ -16,12 +16,18 @@ sudo apt install singularity-container
 
 ## 2. Building a Singularity Image (recommended)
 
-**Option 1: Pull `.sif`**
+**Option 1: Build directly with Singularity/Apptainer**
+
+```bash
+sudo singularity build tribit.sif tribit.def
+```
+
+**Option 2: Pull `.sif`**
 ```bash
 singularity pull tribit.sif library://sixte99/tribit/tribit:v1
 ```
 
-**Option 2: Build with Docker, then convert to `.sif`**
+**Option 3: Build with Docker, then convert to `.sif`**
 
 ```bash
 docker build -t tribit .
@@ -29,11 +35,6 @@ docker save tribit -o tribit.tar
 singularity build tribit.sif docker-archive://tribit.tar
 ```
 
-**Option 3: Build directly with Singularity/Apptainer**
-
-```bash
-sudo singularity build tribit.sif tribit.def
-```
 Once built, `tribit.sif` can be pointed to via `export SIF_PATH=/path/to/tribit.sif` for all benchmark scripts.
 
 ## 3. Building TriBIT From Scratch
