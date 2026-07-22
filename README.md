@@ -7,6 +7,11 @@ This repository contains instructions to deploy and run TriBIT, an efficient tri
 - For single-GPU experiments, an H100 GPU or similar.
 - For multi-GPU and scalability experiments, access to a multi-GPU / multi-node SLURM cluster.
 - The experiments below can be run natively (no container required) or by using a Singularity/Apptainer image (`tribit.sif`), which already contains the built executables and Python dependencies (recommended).
+- You can install Singularity/Apptainer by running
+```bash
+sudo apt update
+sudo apt install singularity-container
+```
 
 ## 2. Building a Singularity Image (recommended)
 
