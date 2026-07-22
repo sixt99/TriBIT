@@ -23,6 +23,7 @@ if [[ -n "$SIF_PATH" ]]; then
 	echo "Running inside container: $SIF_PATH"
 	WORKFOLDER="/app"
 	ARTIFACT_DIR="$WORKFOLDER/artifact/sc26"
+	mkdir -p results/raw
     cmd=(singularity exec \
 	    --nv \
 		--contain \
