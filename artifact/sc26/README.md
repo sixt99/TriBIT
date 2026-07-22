@@ -93,7 +93,7 @@ chmod +x download/download_data_multi.sh
 
 ```bash
 export SIF_PATH=/path/to/tribit.sif   # optional; omit to run natively
-export TMPDIR=/path/to/tmpdir
+export TMPDIR=/path/to/tmpdir # /tmp
 cd artifact/sc26
 ./run_single_gpu.sh           # directly
 #sbatch run_single_gpu.sh     # or via SLURM
