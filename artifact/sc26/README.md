@@ -79,6 +79,7 @@ chmod +x download/download_data_multi.sh
 ./download/download_data_multi.sh --output data/multi_gpu
 ```
 - Downloads 35.62 GiB of compressed data.
+- `Hyperlink-2012` and `Hyperlink-2014` have been omitted but can be included by uncommenting them in `download/download_data_multi.sh`.
 
 ## 5. Running Benchmarks
 
