@@ -11,6 +11,12 @@ DATASETS=(
   "eu-2015/eu-2015"
 )
 BASE_URL="http://data.law.di.unimi.it/webdata"
+
+DATASETS_HYPERLINK=(
+  "https://data.dws.informatik.uni-mannheim.de/hyperlinkgraph/2014-03/webgraph/webgraph"
+  "https://data.dws.informatik.uni-mannheim.de/hyperlinkgraph/2012-08/webgraph/network"
+)
+
 OUTPUT_FOLDER="data/multi_gpu"
 
 # Parse arguments
@@ -40,3 +46,14 @@ for name in "${DATASETS[@]}"; do
   curl -f -C - -o "${OUTPUT_FOLDER}/${name}.properties" "${BASE_URL}/${name}.properties"
   curl -f -C - -o "${OUTPUT_FOLDER}/${name}.graph" "${BASE_URL}/${name}.graph"
 done
+
+for url in "${DATASETS_HYPERLINK[@]}"; do
+  echo "---------------------------------"
+  echo "Downloading $url..."
+  name="$(basename "$url")"
+  mkdir -p "${OUTPUT_FOLDER}/${name}"
+  curl -f -C - -o "${OUTPUT_FOLDER}/${name}/${name}.properties" "${url}.properties"
+  curl -f -C - -o "${OUTPUT_FOLDER}/${name}/${name}.graph" "${url}.graph"
+done
+
+
