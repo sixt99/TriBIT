@@ -15,15 +15,15 @@ sudo apt install singularity-container
 
 ## 2. Building a Singularity Image (recommended)
 
-**Option 1: Build directly with Singularity/Apptainer**
+**Option 1: Pull `.sif`**
+```bash
+singularity pull tribit.sif library://sixte99/tribit/tribit:v1
+```
+
+**Option 2: Build directly with Singularity/Apptainer**
 
 ```bash
 sudo singularity build tribit.sif tribit.def
-```
-
-**Option 2: Pull `.sif`**
-```bash
-singularity pull tribit.sif library://sixte99/tribit/tribit:v1
 ```
 
 **Option 3: Build with Docker, then convert to `.sif`**
