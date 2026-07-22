@@ -33,7 +33,7 @@ Once built, `tribit.sif` can be pointed to via `export SIF_PATH=/path/to/tribit.
 
 ## 3. Building TriBIT From Scratch
 
-If no container is used, TriBIT can be built natively. This requires:
+If NO container is used, TriBIT can be built natively. This requires:
 
 - **CUDA 12.8** (`nvcc`) with an H100-compatible architecture (`compute_90`/`sm_90`).
 - **CCCL v3.3.0**, installed under the CUDA targets directory.
