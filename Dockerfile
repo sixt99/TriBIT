@@ -43,3 +43,5 @@ ENV PMIX_MCA_psec=native
 WORKDIR /app
 COPY . .
 RUN make
+
+CMD ["/app/./tribit"]
