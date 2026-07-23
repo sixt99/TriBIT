@@ -78,6 +78,7 @@ python3 download/download_data_single.py --input download/graphs.txt --output da
 - Downloads 174.57 GiB.
 
 ### Multi-GPU (Large Web Graphs)
+ATTENTION: Before downloading the Large Web Graphs, please make sure you have 32 H100 GPUs across 8 nodes, with SLURM correctly configured. Otherwise, please do not download these matrices, and focus solely on the Single-GPU experiments.
 
 ```bash
 cd artifact/sc26
