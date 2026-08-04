@@ -12,4 +12,4 @@ N_PARTITIONS=64
 srun src/multi_gpu/target/release/rs $DATA_PATH $N_PARTITIONS 
 
 # Run under tribit.sif
-srun --mpi=pmix singularity exec --nv tribit.sif /app/src/multi_gpu/target/release/rs $DATA_PATH $N_PARTITIONS 
+#srun --mpi=pmix singularity exec --nv tribit.sif /app/src/multi_gpu/target/release/rs $DATA_PATH $N_PARTITIONS 

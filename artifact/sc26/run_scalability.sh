@@ -11,4 +11,4 @@ fi
 
 results_path="results/raw"
 # ATTENTION: run this command only when jobs finish 
-# "${plot_cmd[@]}" python3 analysis/analyse_scalability.py --input "$results_path/results_multi.csv" --output "$results_path/../plot_scalability.png" 
+#"${plot_cmd[@]}" python3 analysis/analyse_scalability.py --input "$results_path/results_multi.csv" --output "$results_path/../plot_scalability.png" 
