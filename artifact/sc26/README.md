@@ -77,7 +77,7 @@ python3 download/download_data_single.py --input download/graphs_subset.txt --ou
 ```
 - Downloads 15.83 GiB.
 
-To run the full Single-GPU experiments, set `--input` to `graphs.txt`. In this case, 174.57 GiB are downloaded.
+To run the full Single-GPU experiments, set `--input` to `download/graphs.txt`. In this case, 174.57 GiB are downloaded.
 
 ### Multi-GPU (Large Web Graphs)
 ATTENTION: Before downloading the Large Web Graphs, please make sure you have 32 H100 GPUs across 8 nodes, with SLURM correctly configured. Otherwise, please do not download these matrices, and focus solely on the Single-GPU experiments.
