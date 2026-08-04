@@ -68,14 +68,16 @@ If using `tribit.sif`,
 ```bash
 export SIF_PATH=/path/to/tribit.sif
 cd artifact/sc26
-singularity exec "$SIF_PATH" python3 download/download_data_single.py --input download/graphs.txt --output data
+singularity exec "$SIF_PATH" python3 download/download_data_single.py --input download/graphs_subset.txt --output data
 ```
 If NOT using `tribit.sif`,
 ```bash
 cd artifact/sc26
-python3 download/download_data_single.py --input download/graphs.txt --output data # Requires ssgetpy
+python3 download/download_data_single.py --input download/graphs_subset.txt --output data # Requires ssgetpy
 ```
-- Downloads 174.57 GiB.
+- Downloads 15.83 GiB.
+
+To run the full Single-GPU experiments, set `--input` to `graphs.txt`. In this case, 174.57 GiB are downloaded.
 
 ### Multi-GPU (Large Web Graphs)
 ATTENTION: Before downloading the Large Web Graphs, please make sure you have 32 H100 GPUs across 8 nodes, with SLURM correctly configured. Otherwise, please do not download these matrices, and focus solely on the Single-GPU experiments.
