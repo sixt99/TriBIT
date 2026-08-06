@@ -17,7 +17,7 @@ sudo apt install singularity-container
 
 **Option 1: Pull `.sif`**
 ```bash
-singularity pull tribit.sif library://sixte99/tribit/tribit:v2
+singularity pull tribit.sif library://sixte99/tribit/tribit:v3
 ```
 
 **Option 2: Build directly with Singularity/Apptainer**
