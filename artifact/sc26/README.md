@@ -75,7 +75,7 @@ If NOT using `tribit.sif`,
 cd artifact/sc26
 python3 download/download_data_single.py --input download/graphs_subset.txt --output data # Requires ssgetpy
 ```
-- Downloads 15.83 GiB.
+- Downloads 15.55 GiB.
 
 To run the full Single-GPU experiments, set `--input` to `download/graphs.txt`. In this case, 174.57 GiB are downloaded.
 
