@@ -102,7 +102,7 @@ cd artifact/sc26
 #sbatch run_single_gpu.sh     # or via SLURM
 ```
 
-- Requests 1 H100 GPU (or similar), 2 hours.
+- Requests 1 H100 GPU (or similar).
 - Runs `run_benchmarks/run_single_gpu.py`, which drives the `tribit` executable over each dataset in `data/`, skipping anything in `run_benchmarks/denylist.txt`, and also records memory consumption (`--get_memory_consumption`).
 - Writes raw results to `results/raw/results_single.csv`.
 - Automatically generates `results/plot_single_gpu.png` via `analysis/analyse_single.py`.
