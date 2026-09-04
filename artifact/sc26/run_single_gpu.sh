@@ -72,8 +72,10 @@ results_path="$ARTIFACT_DIR/results/raw"
     --get_memory_consumption 
     #--dry_run
 
-# Plot results
-"${cmd[@]}" python3 $ARTIFACT_DIR/analysis/analyse_single.py --input "$results_path/results_single${out_suffix}.csv" --output "$results_path/../plot_single_gpu${out_suffix}.png" 
+# Plot results (only for TriBIT)
+if [[ -z "$1" ]]; then
+	"${cmd[@]}" python3 $ARTIFACT_DIR/analysis/analyse_single.py --input "$results_path/results_single${out_suffix}.csv" --output "$results_path/../plot_single_gpu${out_suffix}.png" 
+fi
 
 timestamp=$(date +"%Y-%m-%d %H:%M:%S")
 echo "End: $timestamp"
