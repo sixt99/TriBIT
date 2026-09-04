@@ -46,16 +46,8 @@ out_suffix=""
 
 # Optional first argument selects a different executable
 if [[ -n "$1" ]]; then
-    case "$1" in
-        tot|bbtc|tc)
-            exe_path="$1"
-            out_suffix="_$1"
-            ;;
-        *)
-            echo "Error: unrecognised executable '$1'. Must be one of: tot, bbtc, tc" >&2
-            exit 1
-            ;;
-    esac
+	exe_path="$1"
+	out_suffix="_${1##*/}"
 fi
 
 data_path="$ARTIFACT_DIR/data"
