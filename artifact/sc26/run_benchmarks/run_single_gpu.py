@@ -194,7 +194,7 @@ def output_parser_tc(output: str, full_path: str, exe_path: str) -> str:
 exe = args.exe_path.split("/")[-1]
 
 if exe == "tot":
-    header = ("exe,graph,nrows,ncols,original_nnz,extracting_upper_triangle_time,"
+    header = ("exe,graph,nrows,ncols,nnz,extracting_upper_triangle_time,"
               "converting_to_bitmap_time,kernel_time,counting_triangles_time,"
               "triangles,max_memory_consumption")
     make_execution_args = lambda full_path: [args.exe_path, "-i", full_path]
@@ -202,7 +202,7 @@ if exe == "tot":
     output_parser = output_parser_tot
 
 elif exe == "bbtc":
-    header = ("exe,graph,nrows,ncols,original_nnz,N,nnz,n_cuts,n_tasks,n_gpus,"
+    header = ("exe,graph,nrows,ncols,nnz,N,algorithm_nnz,n_cuts,n_tasks,n_gpus,"
               "n_workers,triangles,preprocessing_time,malloc_stream_time,"
               "kernel_time,max_memory_consumption")
     make_execution_args = lambda full_path: [args.exe_path, "--graph", full_path, "--repeat", "1"]
@@ -210,7 +210,7 @@ elif exe == "bbtc":
     output_parser = output_parser_bbtc
 
 elif exe == "tc":
-    header = ("exe,graph,nrows,ncols,original_nnz,n,m,s,a,triangles,prepro_s_time,"
+    header = ("exe,graph,nrows,ncols,nnz,n,m,s,a,triangles,prepro_s_time,"
               "gpu_copy_s_time,kernel_time,gpu_total_s_time,cpu_gpu_s_time,"
               "max_memory_consumption")
     make_execution_args = lambda full_path: [args.exe_path, "-m", full_path, "-s", "10"]

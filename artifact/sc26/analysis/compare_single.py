@@ -35,7 +35,8 @@ ticks_fontsize = 15
 
 rescale_factor = 1
 markers = [".", "x", "^", "v"]
-sorting_magnitude = "original_nnz"
+sorting_magnitude = "nnz"
+pathbase = "results/raw/"
 listdir = [
     "results_single_tot.csv",
     "results_single_bbtc.csv",
@@ -59,7 +60,7 @@ subplot_dict = {
     "memory": plt.subplots(2, len(listdir), figsize=(19, 5), sharex=True, sharey="row"),
 }
 
-df_baseline = pd.read_csv(baseline)
+df_baseline = pd.read_csv(pathbase + baseline)
 df_baseline[[metric for metric in df_baseline.columns if "time" in metric]] /= 1000
 df_baseline["total_time"] = (
     df_baseline["preprocessing_time"] + df_baseline["kernel_time"]
@@ -84,21 +85,30 @@ filename2pretty = {
     "results_single_tc.csv": "WeTriC",
 }
 
+ylabels = ["Time (s)", "Total time (s)", "Total speedup (x)", "# Triangles", "Memory usage (GB)", "Memory ratio (x)"]
+
 for i, file_name in enumerate(listdir):
+    counter = 0
+    title = filename2pretty[file_name]
     for stage in ["time", "correctness", "memory"]:
         fig, axs = subplot_dict[stage]
-        title = filename2pretty[file_name]
-        ax = axs[i] if stage == "correctness" else axs[0, i]
-        ax.set_title(title, fontsize = title_size)
+        n_rows = axs.shape[0] if axs.ndim == 2 else 1
+        for row in range(n_rows):
+            ax = axs[i] if axs.ndim == 1 else axs[row, i]
+            if row == 0:
+                ax.set_title(title, fontsize=title_size)
+            if i == 0:
+                ax.set_ylabel(ylabels[counter], fontsize=label_size)
+            counter += 1
 
-    if not os.path.exists(file_name):
+    if not os.path.exists(pathbase + file_name):
         continue
 
     title = filename2pretty[file_name]
     rescale_factor = (
         1000 if file_name in ["results_single.csv", "results_single_tot.csv"] else 1
     )
-    df = pd.read_csv(file_name)
+    df = pd.read_csv(pathbase + file_name)
     df = df.sort_values(by=sorting_magnitude, ascending=True, ignore_index=True)
     metrics = [
         metric
@@ -114,8 +124,6 @@ for i, file_name in enumerate(listdir):
     fig, axs = subplot_dict["time"]
     ax = axs[ax_counter, i]
     ax_counter += 1
-    if i == 0:
-        ax.set_ylabel("Time (s)", fontsize=label_size)
     for j, metric in enumerate(metrics):
         df["total_time"] += df[metric]
         if metric != "kernel_time":
@@ -178,8 +186,6 @@ for i, file_name in enumerate(listdir):
     ax = axs[ax_counter, i]
     ax_counter += 1
     # ax.set_yscale("linear")
-    if i == 0:
-        ax.set_ylabel("Total speedup (x)", fontsize=label_size)
     df_merged["speedup"] = (df_merged["total_time"] / rescale_factor) / df_merged[
         "total_time_bsc"
     ]
@@ -204,8 +210,6 @@ for i, file_name in enumerate(listdir):
     fig, axs = subplot_dict["correctness"]
     ax = axs[i]
 
-    if i == 0:
-        ax.set_ylabel("# Triangles", fontsize=label_size)
     if "triangles" in df.columns:
         df_matches = df_merged[df_merged["triangles"] == df_merged["triangles_bsc"]]
         df_mismatches = df_merged[df_merged["triangles"] != df_merged["triangles_bsc"]]
@@ -240,8 +244,6 @@ for i, file_name in enumerate(listdir):
     ax = axs[ax_counter, i]
     ax_counter += 1
 
-    if i == 0:
-        ax.set_ylabel("Memory usage (GB)", fontsize=label_size)
     # ax.set_yscale("linear")
     xmin = round(df[sorting_magnitude].min())
     xmax = round(df[sorting_magnitude].max())
@@ -259,8 +261,6 @@ for i, file_name in enumerate(listdir):
     ################# MEMORY RATIO #################
     ax = axs[ax_counter, i]
     ax_counter += 1
-    if i == 0:
-        ax.set_ylabel("Memory ratio (x)", fontsize=label_size)
     ax.set_yscale("linear")
     df_to_plot = (
         df_merged["max_memory_consumption_bsc"] / df_merged["max_memory_consumption"]
