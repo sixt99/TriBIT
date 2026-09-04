@@ -42,6 +42,22 @@ else
 fi
 
 exe_path="$WORKFOLDER/./tribit"
+out_suffix=""
+
+# Optional first argument selects a different executable
+if [[ -n "$1" ]]; then
+    case "$1" in
+        tot|bbtc|tc)
+            exe_path="$1"
+            out_suffix="_$1"
+            ;;
+        *)
+            echo "Error: unrecognised executable '$1'. Must be one of: tot, bbtc, tc" >&2
+            exit 1
+            ;;
+    esac
+fi
+
 data_path="$ARTIFACT_DIR/data"
 denyfile_path="$ARTIFACT_DIR/run_benchmarks/denylist.txt"
 results_path="$ARTIFACT_DIR/results/raw"
@@ -51,13 +67,13 @@ results_path="$ARTIFACT_DIR/results/raw"
     --exe_path "$exe_path" \
     --data_path "$data_path" \
     --denyfile_path "$denyfile_path" \
-    --out_path "$results_path/results_single.csv" \
+    --out_path "$results_path/results_single${out_suffix}.csv" \
     --n_repetitions 1 \
     --get_memory_consumption 
     #--dry_run
 
 # Plot results
-"${cmd[@]}" python3 $ARTIFACT_DIR/analysis/analyse_single.py --input "$results_path/results_single.csv" --output "$results_path/../plot_single_gpu.png" 
+"${cmd[@]}" python3 $ARTIFACT_DIR/analysis/analyse_single.py --input "$results_path/results_single${out_suffix}.csv" --output "$results_path/../plot_single_gpu${out_suffix}.png" 
 
 timestamp=$(date +"%Y-%m-%d %H:%M:%S")
 echo "End: $timestamp"
