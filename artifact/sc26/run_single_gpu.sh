@@ -50,6 +50,13 @@ if [[ -n "$1" ]]; then
 	out_suffix="_${1##*/}"
 fi
 
+# WeTriC requires a preprocessing where extra columns in .mtx files are removed 
+if [[ "${exe_path: -2}" == "tc" ]]; then
+    preprocess_flag="--preprocess"
+else
+    preprocess_flag=""
+fi
+
 data_path="$ARTIFACT_DIR/data"
 denyfile_path="$ARTIFACT_DIR/run_benchmarks/denylist.txt"
 results_path="$ARTIFACT_DIR/results/raw"
@@ -61,7 +68,8 @@ results_path="$ARTIFACT_DIR/results/raw"
     --denyfile_path "$denyfile_path" \
     --out_path "$results_path/results_single${out_suffix}.csv" \
     --n_repetitions 1 \
-    --get_memory_consumption 
+    --get_memory_consumption \
+	$preprocess_flag
     #--dry_run
 
 # Plot results (only for TriBIT)
