@@ -85,8 +85,15 @@ filename2pretty = {
 }
 
 for i, file_name in enumerate(listdir):
+    for stage in ["time", "correctness", "memory"]:
+        fig, axs = subplot_dict[stage]
+        title = filename2pretty[file_name]
+        ax = axs[i] if stage == "correctness" else axs[0, i]
+        ax.set_title(title, fontsize = title_size)
+
     if not os.path.exists(file_name):
         continue
+
     title = filename2pretty[file_name]
     rescale_factor = (
         1000 if file_name in ["results_single.csv", "results_single_tot.csv"] else 1
@@ -107,7 +114,6 @@ for i, file_name in enumerate(listdir):
     fig, axs = subplot_dict["time"]
     ax = axs[ax_counter, i]
     ax_counter += 1
-    ax.set_title(title, fontsize=title_size)
     if i == 0:
         ax.set_ylabel("Time (s)", fontsize=label_size)
     for j, metric in enumerate(metrics):
@@ -197,7 +203,6 @@ for i, file_name in enumerate(listdir):
     ################# NUMBER OF TRIANGLES #################
     fig, axs = subplot_dict["correctness"]
     ax = axs[i]
-    ax.set_title(title, fontsize=title_size)
 
     if i == 0:
         ax.set_ylabel("# Triangles", fontsize=label_size)
@@ -234,7 +239,6 @@ for i, file_name in enumerate(listdir):
     fig, axs = subplot_dict["memory"]
     ax = axs[ax_counter, i]
     ax_counter += 1
-    ax.set_title(title, fontsize=title_size)
 
     if i == 0:
         ax.set_ylabel("Memory usage (GB)", fontsize=label_size)
