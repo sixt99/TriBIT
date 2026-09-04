@@ -152,7 +152,7 @@ export TMPDIR=/path/to/tmpdir         # /tmp
 cd artifact/sc26
 ./run_single_gpu.sh $EXE_PATH
 ```
-where EXE_PATH is `tot`, `bbtc`, or `WeTriC/tc`. Run the command separately for each technique. The benchmark script writes the results to the corresponding CSV file in results/raw/.
+where EXE_PATH is `tot`, `bbtc`, or `WeTriC/tc`. Run the command separately for each technique. The benchmark script writes the results to the corresponding CSV file in `results/raw/`.
 
 
 Once the desired benchmark results have been generated, run:
