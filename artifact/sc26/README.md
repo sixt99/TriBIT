@@ -182,6 +182,9 @@ If a baseline CSV is missing, the corresponding column is skipped automatically.
 | `results/plot_single_gpu.png` | `analysis/analyse_single.py` | Single-GPU performance plot |
 | `results/plot_multi_gpu.txt` | `analysis/analyse_multi.py` | Multi-GPU performance summary |
 | `results/plot_scalability.png` | `analysis/analyse_scalability.py` (manual step) | Strong/weak scaling plot across 1–8 nodes |
+| `results/plot_compare_time.png` | `analysis/compare_single.py` | Execution-time comparison against baselines |
+| `results/plot_compare_correctness.png` | `analysis/compare_single.py` | Triangle-count correctness comparison |
+| `results/plot_compare_memory.png` | `analysis/compare_single.py` | GPU memory comparison |
 
 ## 7. Notes
 - Dry runs are available: uncomment the `#--dry_run` flag in `run_single_gpu.sh` / `run_multi_gpu.sh` to validate the pipeline without launching full benchmarks.
