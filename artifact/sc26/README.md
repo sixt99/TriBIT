@@ -132,7 +132,48 @@ chmod +x run_scalability.sh
 - Submits `run_benchmarks/scale_gpus.sh` once per node count, for `N_NODES` in `1..7` (8-node results are already covered by the multi-GPU experiment above).
 - **Important:** the final plotting step (`analysis/analyse_scalability.py`, producing `results/plot_scalability.png`) is commented out in `run_scalability.sh` by design, since it must only be run *after* all submitted jobs have completed. Once all scalability jobs finish, uncomment and run that line manually.
 
-## 6. Outputs
+## 6. Comparing TriBIT against ToT, bbTC, and WeTriC
+
+To compare TriBIT against the three baseline implementations, first install the following techniques:
+
+ * ToT: https://github.com/yuang-chen/ToT-TPDS25
+ * bbTC: https://github.com/GT-TDAlab/bbTC
+ * WeTriC: https://github.com/jeffreyspaan/wedge-parallel-triangle-counting
+
+ATTENTION: The comparison scripts work even if only a subset of the baseline techniques is installed. You only need to install the techniques you want to evaluate.
+
+Make sure that each executable can be invoked from the command line: `tot`, `WeTriC/tc`, `bbtc`.
+
+The same single-GPU benchmark driver used for TriBIT can be used to run each baseline. For example:
+
+```bash
+export SIF_PATH=/path/to/tribit.sif   # optional; omit to run natively
+export TMPDIR=/path/to/tmpdir         # /tmp
+cd artifact/sc26
+./run_single_gpu.sh $EXE_PATH
+```
+where EXE_PATH is `tot`, `bbtc`, or `WeTriC/tc`. Run the command separately for each technique. The benchmark script writes the results to the corresponding CSV file in results/raw/.
+
+
+Once the desired benchmark results have been generated, run:
+
+```bash
+cd artifact/sc26
+python3 analysis/compare_single.py
+```
+
+The script reads the available CSV files from `results/raw/`, uses TriBIT (`results_single.csv`) as the baseline, and the script produces three figures:
+
+```
+results/plot_compare_time.png
+results/plot_compare_correctness.png
+results/plot_compare_memory.png
+```
+
+If a baseline CSV is missing, the corresponding column is skipped automatically.
+
+
+## 7. Outputs
 
 | File | Produced by | Description |
 |---|---|---|
