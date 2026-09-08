@@ -61,7 +61,8 @@ def keep_first_two_columns(input_path):
     and keep only the first two (row, col) fields of every entry line.
     Only called when --preprocess is passed, since it mutates the file."""
     first = True
-    with tempfile.NamedTemporaryFile("w", delete=False, dir=".") as tmp:
+    target_dir = os.path.dirname(os.path.abspath(input_path)) or "."
+    with tempfile.NamedTemporaryFile("w", delete=False, dir=target_dir) as tmp:
         with open(input_path, "r") as infile:
             for line in infile:
                 if line.startswith("%"):
