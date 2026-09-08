@@ -161,6 +161,11 @@ Once the desired benchmark results have been generated, run:
 cd artifact/sc26
 python3 analysis/compare_single.py
 ```
+or, if the `.sif` file is used,
+```bash
+cd artifact/sc26
+singularity exec "$SIF_PATH" python3 analysis/compare_single.py
+```
 
 The script reads the available CSV files from `results/raw/`, uses TriBIT (`results_single.csv`) as the baseline, and the script produces three figures:
 
@@ -186,6 +191,6 @@ If a baseline CSV is missing, the corresponding column is skipped automatically.
 | `results/plot_compare_correctness.png` | `analysis/compare_single.py` | Triangle-count correctness comparison |
 | `results/plot_compare_memory.png` | `analysis/compare_single.py` | GPU memory comparison |
 
-## 7. Notes
+## 8. Notes
 - Dry runs are available: uncomment the `#--dry_run` flag in `run_single_gpu.sh` / `run_multi_gpu.sh` to validate the pipeline without launching full benchmarks.
 - The flag `--max_matrices` in `run_benchmarks/run_single_gpu.py` allows to limit the maximum processed `.mtx` files in single-GPU experiments.
