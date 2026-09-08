@@ -193,7 +193,7 @@ def output_parser_tc(output: str, full_path: str, exe_path: str) -> str:
 
 exe = args.exe_path.split("/")[-1]
 
-if exe.split("/")[-1] == "tot":
+if exe == "tot":
     header = ("exe,graph,nrows,ncols,nnz,extracting_upper_triangle_time,"
               "converting_to_bitmap_time,kernel_time,counting_triangles_time,"
               "triangles,max_memory_consumption")
@@ -201,7 +201,7 @@ if exe.split("/")[-1] == "tot":
     memory_function = get_max_memory_consumption
     output_parser = output_parser_tot
 
-elif exe.split("/")[-1] == "bbtc":
+elif exe == "bbtc":
     header = ("exe,graph,nrows,ncols,nnz,N,algorithm_nnz,n_cuts,n_tasks,n_gpus,"
               "n_workers,triangles,preprocessing_time,malloc_stream_time,"
               "kernel_time,max_memory_consumption")
@@ -209,7 +209,7 @@ elif exe.split("/")[-1] == "bbtc":
     memory_function = get_max_memory_consumption
     output_parser = output_parser_bbtc
 
-elif exe.split("/")[-1] == "tc":
+elif exe == "tc":
     header = ("exe,graph,nrows,ncols,nnz,n,m,s,a,triangles,prepro_s_time,"
               "gpu_copy_s_time,kernel_time,gpu_total_s_time,cpu_gpu_s_time,"
               "max_memory_consumption")

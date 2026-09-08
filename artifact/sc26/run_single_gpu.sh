@@ -26,7 +26,6 @@ if [[ -n "$SIF_PATH" ]]; then
     mkdir -p results/raw
     cmd=(singularity exec \
         --nv \
-        --contain \
         --bind "$TMPDIR:/tmp" \
         --bind "data:$ARTIFACT_DIR/data" \
         --bind "results:$ARTIFACT_DIR/results" \
