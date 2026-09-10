@@ -50,11 +50,12 @@ if [[ -n "$1" ]]; then
 fi
 
 # WeTriC requires a preprocessing where extra columns in .mtx files are removed 
-if [[ "${exe_path: -2}" == "tc" ]]; then
-    preprocess_flag="--preprocess"
-else
-    preprocess_flag=""
-fi
+# if [[ "${exe_path: -2}" == "tc" ]]; then
+#    preprocess_flag="--preprocess"
+# else
+#    preprocess_flag=""
+#fi
+preprocess_flag="--preprocess" # Preprocess no matter what
 
 data_path="$ARTIFACT_DIR/data"
 denyfile_path="$ARTIFACT_DIR/run_benchmarks/denylist.txt"
